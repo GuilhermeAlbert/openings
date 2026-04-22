@@ -1,26 +1,74 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: oklch(0.985 0.004 250);
+  --foreground: oklch(0.22 0.008 255);
+  --card: oklch(0.995 0.002 250);
+  --card-foreground: oklch(0.22 0.008 255);
+  --muted: oklch(0.965 0.004 250);
+  --muted-foreground: oklch(0.52 0.012 255);
+  --border: oklch(0.92 0.004 250);
+  --input: oklch(0.92 0.004 250);
+  --ring: oklch(0.56 0.03 255);
+  --primary: oklch(0.26 0.024 257);
+  --primary-foreground: oklch(0.98 0.002 250);
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: oklch(0.17 0.008 255);
+  --foreground: oklch(0.94 0.006 255);
+  --card: oklch(0.2 0.01 255);
+  --card-foreground: oklch(0.94 0.006 255);
+  --muted: oklch(0.24 0.01 255);
+  --muted-foreground: oklch(0.72 0.012 255);
+  --border: oklch(0.33 0.01 255 / 0.7);
+  --input: oklch(0.33 0.01 255 / 0.7);
+  --ring: oklch(0.74 0.02 255);
+  --primary: oklch(0.92 0.008 255);
+  --primary-foreground: oklch(0.2 0.01 255);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--border);
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(
+      120% 90% at 50% 0%,
+      color-mix(in oklab, var(--muted) 45%, transparent) 0%,
+      transparent 60%
+    ),
+    var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    var(--font-geist-sans),
+    "Geist",
+    "Inter",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
+  text-rendering: optimizeLegibility;
 }
