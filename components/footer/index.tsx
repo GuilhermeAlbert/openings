@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils/tailwind";
 import { motion } from "framer-motion";
 import { Link2 } from "lucide-react";
 import { FooterBottom } from "./footer-bottom";
+import { GithubIcon } from "@/components/icons/github";
 import { FooterBrand } from "./footer-brand";
 import { FooterLinks } from "./footer-links";
 import {
@@ -31,17 +32,16 @@ const DEFAULT_LINK_GROUPS: FooterLinkGroup[] = [
     links: [
       {
         label: "GitHub",
-        href: "https://github.com/user/openings",
+        href: "https://github.com/GuilhermeAlbert/openings",
         external: true,
       },
       {
         label: "Contributing",
-        href: "https://github.com/user/openings/blob/main/CONTRIBUTING.md",
-        external: true,
+        href: "/docs/contributing",
       },
       {
         label: "Report issue",
-        href: "https://github.com/user/openings/issues/new",
+        href: "https://github.com/GuilhermeAlbert/openings/issues/new",
         external: true,
       },
     ],
@@ -60,7 +60,7 @@ const DEFAULT_SOCIAL_LINKS: FooterSocialLink[] = [
   {
     label: "GitHub",
     href: "https://github.com/GuilhermeAlbert/openings",
-    icon: Link2,
+    icon: GithubIcon,
     external: true,
   },
 ];
@@ -69,7 +69,7 @@ export function Footer({
   className,
   brandHref = "/",
   brandName = "openings.dev",
-  brandTagline = "Remote jobs intelligence",
+  brandTagline = "Tech jobs aggregated",
   description = "Discover meaningful remote opportunities through curated signals, trusted repositories, and structured hiring insights.",
   supportEmail = "support@openings.dev",
   supportText = "Built for distributed teams and high-context hiring decisions.",

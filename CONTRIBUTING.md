@@ -12,7 +12,7 @@ Thanks for helping improve openings.dev.
 ## Development setup
 
 ```bash
-git clone https://github.com/user/openings
+git clone https://github.com/GuilhermeAlbert/openings
 cd openings
 npm install
 npm run dev
@@ -32,6 +32,7 @@ npm run build
 ```
 
 4. Open a Pull Request with:
+
 - clear summary
 - screenshots for UI changes
 - test notes (what you ran)

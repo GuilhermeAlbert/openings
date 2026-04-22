@@ -7,7 +7,7 @@ export const enTranslations: TranslationMessages = {
   },
   header: {
     brandName: "openings.dev",
-    brandTagline: "Remote jobs intelligence",
+    brandTagline: "Tech jobs aggregated",
     languagePlaceholder: "Language",
     languageAriaLabel: "Select language",
     languageChanged: "Language set to {language}.",

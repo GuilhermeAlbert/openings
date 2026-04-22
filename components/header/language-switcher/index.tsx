@@ -12,19 +12,20 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils/tailwind";
 import type { LanguageSwitcherProps } from "../types";
+import { FlagBR, FlagDE, FlagES, FlagFR, FlagIT, FlagUS } from "./flags";
 import {
   languageSwitcherContentStyles,
   languageSwitcherTriggerStyles,
   languageSwitcherWrapperStyles,
 } from "./styles";
 
-const LOCALE_FLAGS: Record<string, string> = {
-  en: "🇺🇸",
-  pt: "🇧🇷",
-  es: "🇪🇸",
-  it: "🇮🇹",
-  fr: "🇫🇷",
-  de: "🇩🇪",
+const LOCALE_FLAGS: Record<string, React.ReactNode> = {
+  en: <FlagUS className="rounded-[2px] shadow-sm" />,
+  pt: <FlagBR className="rounded-[2px] shadow-sm" />,
+  es: <FlagES className="rounded-[2px] shadow-sm" />,
+  it: <FlagIT className="rounded-[2px] shadow-sm" />,
+  fr: <FlagFR className="rounded-[2px] shadow-sm" />,
+  de: <FlagDE className="rounded-[2px] shadow-sm" />,
 };
 
 export function LanguageSwitcher({
@@ -74,7 +75,9 @@ export function LanguageSwitcher({
           {locales.map((entry) => (
             <SelectItem key={entry.code} value={entry.code}>
               <span className="flex items-center gap-2">
-                <span className="text-base leading-none">{LOCALE_FLAGS[entry.code] || "🌐"}</span>
+                <span className="flex size-4 items-center justify-center text-base leading-none">
+                  {LOCALE_FLAGS[entry.code]}
+                </span>
                 <span className="text-[13px] font-medium">{entry.nativeLabel}</span>
               </span>
             </SelectItem>

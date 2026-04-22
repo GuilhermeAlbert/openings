@@ -16,7 +16,7 @@ export function BrandLogo({
   className,
   href = "/",
   brandName = "openings.dev",
-  brandTagline = "Remote jobs intelligence",
+  brandTagline = "Tech jobs aggregated",
   lightLogoSrc = "/light-mode-favicon.svg",
   darkLogoSrc = "/dark-mode-favicon.svg",
 }: BrandLogoProps) {

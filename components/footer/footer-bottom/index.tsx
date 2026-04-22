@@ -1,6 +1,7 @@
 import * as React from "react";
 import { motion } from "framer-motion";
 import { Copy, Mail } from "lucide-react";
+import Image from "next/image";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/tailwind";
@@ -61,7 +62,16 @@ export function FooterBottom({
             <Copy className="size-3.5 opacity-70" aria-hidden="true" />
           </Button>
         ) : null}
-        <p className={footerSignatureStyles()}>{signature}</p>
+        <div className="flex items-center gap-2">
+          <p className={footerSignatureStyles()}>Powered by</p>
+          <Image
+            src="/trebla-solid-white-logo-inline.svg"
+            alt="Trebla Logo"
+            width={60}
+            height={16}
+            className="opacity-90 dark:invert-0 invert"
+          />
+        </div>
       </div>
     </motion.div>
   );
