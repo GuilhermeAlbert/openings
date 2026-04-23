@@ -6,7 +6,6 @@ import {
   Building2,
   CircleDot,
   CalendarDays,
-  ExternalLink,
   Landmark,
   MapPin,
   Wallet,
@@ -66,6 +65,8 @@ function formatSalary(
 export function OpportunityCard({
   item,
   viewMode,
+  isSelected,
+  onSelectOpportunity,
   onCommunitySelect,
   onAuthorSelect,
 }: OpportunityCardProps) {
@@ -78,20 +79,17 @@ export function OpportunityCard({
       }),
     [locale],
   );
-  const openExternal = () => {
-    window.open(item.url, "_blank", "noopener,noreferrer");
-  };
-
   return (
     <article
-      className={cn(opportunityCardStyles({ viewMode }))}
-      role="link"
+      className={cn(opportunityCardStyles({ viewMode, selected: isSelected }))}
+      role="button"
       tabIndex={0}
-      onClick={openExternal}
+      aria-pressed={isSelected}
+      onClick={() => onSelectOpportunity(item)}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          openExternal();
+          onSelectOpportunity(item);
         }
       }}
     >
@@ -102,9 +100,8 @@ export function OpportunityCard({
               <CircleDot className="size-3.5" />
               {cardMessages.statusOpen}
             </div>
-            <p className="inline-flex items-center gap-1 text-base font-semibold tracking-[-0.01em] text-foreground transition-colors group-hover:text-muted-foreground">
+            <p className="text-base font-semibold tracking-[-0.01em] text-foreground transition-colors group-hover:text-muted-foreground">
               {item.title}
-              <ExternalLink className="size-3.5" />
             </p>
             <p className="max-w-[62ch] text-sm leading-6 text-muted-foreground">
               {item.excerpt}

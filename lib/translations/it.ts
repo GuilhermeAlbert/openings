@@ -103,6 +103,11 @@ export const itTranslations: TranslationMessages = {
     },
     card: {
       statusOpen: "Aperta",
+      detailsLabel: "Dettagli opportunità",
+      closeDetails: "Chiudi dettagli",
+      postedAt: "Pubblicata: {date}",
+      updatedAt: "Aggiornata: {date}",
+      openOriginal: "Apri annuncio originale",
       salaryPeriodMonth: "mese",
       salaryPeriodYear: "anno",
       salaryPeriodHour: "ora",

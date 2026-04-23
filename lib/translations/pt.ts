@@ -102,6 +102,11 @@ export const ptTranslations: TranslationMessages = {
     },
     card: {
       statusOpen: "Aberta",
+      detailsLabel: "Detalhes da vaga",
+      closeDetails: "Fechar detalhes",
+      postedAt: "Publicada em: {date}",
+      updatedAt: "Atualizada em: {date}",
+      openOriginal: "Abrir publicação original",
       salaryPeriodMonth: "mês",
       salaryPeriodYear: "ano",
       salaryPeriodHour: "hora",

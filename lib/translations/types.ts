@@ -99,6 +99,11 @@ export interface TranslationMessages {
     };
     card: {
       statusOpen: string;
+      detailsLabel: string;
+      closeDetails: string;
+      postedAt: string;
+      updatedAt: string;
+      openOriginal: string;
       salaryPeriodMonth: string;
       salaryPeriodYear: string;
       salaryPeriodHour: string;

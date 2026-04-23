@@ -16,6 +16,7 @@ import {
   opportunitiesHeaderStyles,
   opportunitiesKickerStyles,
   opportunitiesScreenStyles,
+  splitViewStyles,
   opportunitiesTitleStyles,
 } from "@/components/opportunities-screen/styles";
 import type {
@@ -30,6 +31,7 @@ import type {
 } from "@/components/opportunities-screen/types";
 import { OpportunitiesFilters } from "@/components/opportunities-screen/opportunities-filters";
 import { OpportunitiesList } from "@/components/opportunities-screen/opportunities-list";
+import { OpportunityDrawer } from "@/components/opportunities-screen/opportunity-drawer";
 import { OpportunitiesToolbar } from "@/components/opportunities-screen/opportunities-toolbar";
 
 const ITEMS_PER_PAGE_OPTIONS = [10, 20, 30, 50] as const;
@@ -387,6 +389,7 @@ export function OpportunitiesScreen({
   const [filtersExpanded, setFiltersExpanded] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isFetchingMore, setIsFetchingMore] = React.useState(false);
+  const [selectedOpportunityId, setSelectedOpportunityId] = React.useState<string | null>(null);
   const fetchAbortRef = React.useRef<AbortController | null>(null);
 
   const openOpportunities = React.useMemo(
@@ -462,6 +465,7 @@ export function OpportunitiesScreen({
       setHasMoreRemote(true);
       setNextCursor(null);
       setOpportunities([]);
+      setSelectedOpportunityId(null);
       setFilters((previous) =>
         previous.page === 1 ? previous : { ...previous, page: 1 },
       );
@@ -631,6 +635,16 @@ export function OpportunitiesScreen({
     const end = currentPage * normalizedFilters.itemsPerPage;
     return filteredOpportunities.slice(0, end);
   }, [currentPage, filteredOpportunities, normalizedFilters.itemsPerPage]);
+
+  const selectedOpportunity = React.useMemo(
+    () =>
+      selectedOpportunityId
+        ? filteredOpportunities.find((item) => item.id === selectedOpportunityId) ?? null
+        : null,
+    [filteredOpportunities, selectedOpportunityId],
+  );
+
+  const isDetailsOpen = Boolean(selectedOpportunity);
 
   const rangeLabel = React.useMemo(() => {
     if (totalCount === 0) {
@@ -849,6 +863,14 @@ export function OpportunitiesScreen({
     [router],
   );
 
+  const handleSelectOpportunity = React.useCallback((item: OpportunityItem) => {
+    setSelectedOpportunityId(item.id);
+  }, []);
+
+  const handleCloseDetails = React.useCallback(() => {
+    setSelectedOpportunityId(null);
+  }, []);
+
   React.useEffect(() => {
     if (!normalizedForcedAuthor) {
       return;
@@ -921,23 +943,35 @@ export function OpportunitiesScreen({
         onViewModeChange={(value) => handleFieldChange("viewMode", value)}
       />
 
-      <OpportunitiesList
-        items={visibleOpportunities}
-        viewMode={normalizedFilters.viewMode}
-        isLoading={isLoading}
-        isFetchingMore={isFetchingMore}
-        hasMore={hasMore}
-        hasActiveFilters={hasActiveFilters}
-        rangeLabel={rangeLabel}
-        totalCount={totalCount}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        skeletonCount={Math.min(normalizedFilters.itemsPerPage, 8)}
-        onLoadMore={handleLoadMore}
-        onClearFilters={handleClearFilters}
-        onCommunitySelect={handleCommunitySelect}
-        onAuthorSelect={handleAuthorSelect}
-      />
+      <div className={splitViewStyles({ open: isDetailsOpen })}>
+        <OpportunitiesList
+          items={visibleOpportunities}
+          viewMode={isDetailsOpen ? "list" : normalizedFilters.viewMode}
+          selectedOpportunityId={selectedOpportunity?.id ?? null}
+          isLoading={isLoading}
+          isFetchingMore={isFetchingMore}
+          hasMore={hasMore}
+          hasActiveFilters={hasActiveFilters}
+          rangeLabel={rangeLabel}
+          totalCount={totalCount}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          skeletonCount={Math.min(normalizedFilters.itemsPerPage, 8)}
+          onLoadMore={handleLoadMore}
+          onClearFilters={handleClearFilters}
+          onSelectOpportunity={handleSelectOpportunity}
+          onCommunitySelect={handleCommunitySelect}
+          onAuthorSelect={handleAuthorSelect}
+        />
+
+        <OpportunityDrawer
+          item={selectedOpportunity}
+          open={isDetailsOpen}
+          onClose={handleCloseDetails}
+          onCommunitySelect={handleCommunitySelect}
+          onAuthorSelect={handleAuthorSelect}
+        />
+      </div>
     </section>
   );
 }

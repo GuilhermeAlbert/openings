@@ -94,9 +94,14 @@ export const opportunityCardStyles = cva(
         list: "",
         grid: "",
       },
+      selected: {
+        true: "border-primary/45 bg-primary/5",
+        false: "",
+      },
     },
     defaultVariants: {
       viewMode: "list",
+      selected: false,
     },
   },
 );
@@ -104,3 +109,15 @@ export const opportunityCardStyles = cva(
 export const metadataRowStyles = cva(
   "flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground",
 );
+
+export const splitViewStyles = cva("grid gap-4", {
+  variants: {
+    open: {
+      true: "lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]",
+      false: "grid-cols-1",
+    },
+  },
+  defaultVariants: {
+    open: false,
+  },
+});

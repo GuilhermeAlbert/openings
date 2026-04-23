@@ -104,6 +104,11 @@ export const esTranslations: TranslationMessages = {
     },
     card: {
       statusOpen: "Abierta",
+      detailsLabel: "Detalles de la vacante",
+      closeDetails: "Cerrar detalles",
+      postedAt: "Publicada: {date}",
+      updatedAt: "Actualizada: {date}",
+      openOriginal: "Abrir publicación original",
       salaryPeriodMonth: "mes",
       salaryPeriodYear: "año",
       salaryPeriodHour: "hora",

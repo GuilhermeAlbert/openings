@@ -102,6 +102,11 @@ export const enTranslations: TranslationMessages = {
     },
     card: {
       statusOpen: "Open",
+      detailsLabel: "Opportunity details",
+      closeDetails: "Close details",
+      postedAt: "Published: {date}",
+      updatedAt: "Updated: {date}",
+      openOriginal: "Open original posting",
       salaryPeriodMonth: "month",
       salaryPeriodYear: "year",
       salaryPeriodHour: "hour",

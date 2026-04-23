@@ -110,6 +110,7 @@ export interface OpportunitiesToolbarProps {
 export interface OpportunitiesListProps {
   items: OpportunityItem[];
   viewMode: OpportunityViewMode;
+  selectedOpportunityId: string | null;
   isLoading: boolean;
   isFetchingMore: boolean;
   hasMore: boolean;
@@ -121,6 +122,7 @@ export interface OpportunitiesListProps {
   skeletonCount: number;
   onLoadMore: () => void;
   onClearFilters: () => void;
+  onSelectOpportunity: (item: OpportunityItem) => void;
   onCommunitySelect: (repository: string) => void;
   onAuthorSelect: (authorHandle: string) => void;
 }
@@ -128,6 +130,8 @@ export interface OpportunitiesListProps {
 export interface OpportunityCardProps {
   item: OpportunityItem;
   viewMode: OpportunityViewMode;
+  isSelected: boolean;
+  onSelectOpportunity: (item: OpportunityItem) => void;
   onCommunitySelect: (repository: string) => void;
   onAuthorSelect: (authorHandle: string) => void;
 }
@@ -140,4 +144,12 @@ export interface ViewModeToggleProps {
 export interface OpportunitiesScreenProps {
   forcedRepository?: string;
   forcedAuthor?: string;
+}
+
+export interface OpportunityDrawerProps {
+  item: OpportunityItem | null;
+  open: boolean;
+  onClose: () => void;
+  onCommunitySelect: (repository: string) => void;
+  onAuthorSelect: (authorHandle: string) => void;
 }

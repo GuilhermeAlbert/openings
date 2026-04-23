@@ -48,6 +48,7 @@ function OpportunitySkeleton({ compact }: { compact: boolean }) {
 export function OpportunitiesList({
   items,
   viewMode,
+  selectedOpportunityId,
   isLoading,
   isFetchingMore,
   hasMore,
@@ -59,6 +60,7 @@ export function OpportunitiesList({
   skeletonCount,
   onLoadMore,
   onClearFilters,
+  onSelectOpportunity,
   onCommunitySelect,
   onAuthorSelect,
 }: OpportunitiesListProps) {
@@ -152,6 +154,8 @@ export function OpportunitiesList({
                 <OpportunityCard
                   item={item}
                   viewMode={viewMode}
+                  isSelected={selectedOpportunityId === item.id}
+                  onSelectOpportunity={onSelectOpportunity}
                   onCommunitySelect={onCommunitySelect}
                   onAuthorSelect={onAuthorSelect}
                 />
