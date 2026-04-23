@@ -1,10 +1,10 @@
 "use client";
 
-import { cn } from "@/lib/utils/tailwind";
 import { motion } from "framer-motion";
-import { Link2 } from "lucide-react";
-import { FooterBottom } from "./footer-bottom";
+import { useI18n } from "@/components/providers/i18n-provider";
 import { GithubIcon } from "@/components/icons/github";
+import { cn } from "@/lib/utils/tailwind";
+import { FooterBottom } from "./footer-bottom";
 import { FooterBrand } from "./footer-brand";
 import { FooterLinks } from "./footer-links";
 import {
@@ -16,79 +16,99 @@ import {
 } from "./styles";
 import type { FooterLinkGroup, FooterProps, FooterSocialLink } from "./types";
 
-const DEFAULT_LINK_GROUPS: FooterLinkGroup[] = [
-  {
-    id: "project",
-    title: "Project",
-    links: [
-      { label: "Overview", href: "/" },
-      { label: "API Reference", href: "/docs/api" },
-      { label: "Status", href: "https://status.openings.dev", external: true },
-    ],
-  },
-  {
-    id: "open-source",
-    title: "Open Source",
-    links: [
-      {
-        label: "GitHub",
-        href: "https://github.com/GuilhermeAlbert/openings",
-        external: true,
-      },
-      {
-        label: "Contributing",
-        href: "/docs/contributing",
-      },
-      {
-        label: "Report issue",
-        href: "https://github.com/GuilhermeAlbert/openings/issues/new",
-        external: true,
-      },
-    ],
-  },
-  {
-    id: "legal",
-    title: "Legal",
-    links: [
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms of Service", href: "/terms" },
-    ],
-  },
-];
-
-const DEFAULT_SOCIAL_LINKS: FooterSocialLink[] = [
-  {
-    label: "GitHub",
-    href: "https://github.com/GuilhermeAlbert/openings",
-    icon: GithubIcon,
-    external: true,
-  },
-];
-
 export function Footer({
   className,
   brandHref = "/",
   brandName = "openings.dev",
-  brandTagline = "Tech jobs aggregated",
-  description = "Discover meaningful remote opportunities through curated signals, trusted repositories, and structured hiring insights.",
+  brandTagline,
+  description,
   supportEmail = "support@openings.dev",
-  supportText = "Built for distributed teams and high-context hiring decisions.",
+  supportEmailButtonLabel,
+  supportEmailCopiedMessage,
+  supportEmailCopyErrorMessage,
+  supportText,
   copyrightText,
-  signature = "Powered by Trebla",
+  signature,
   lightLogoSrc = "/light-mode-favicon.svg",
   darkLogoSrc = "/dark-mode-favicon.svg",
   linkGroups,
   socialLinks,
 }: FooterProps) {
-  const resolvedLinkGroups = linkGroups?.length
-    ? linkGroups
-    : DEFAULT_LINK_GROUPS;
-  const resolvedSocialLinks = socialLinks?.length
-    ? socialLinks
-    : DEFAULT_SOCIAL_LINKS;
+  const { messages } = useI18n();
+  const footerMessages = messages.footer;
+  const year = new Date().getFullYear().toString();
+
+  const defaultLinkGroups: FooterLinkGroup[] = [
+    {
+      id: "project",
+      title: footerMessages.groups.project,
+      links: [
+        { label: footerMessages.links.overview, href: "/overview" },
+        { label: footerMessages.links.apiReference, href: "/docs/api" },
+        {
+          label: footerMessages.links.status,
+          href: "https://status.openings.dev",
+          external: true,
+        },
+      ],
+    },
+    {
+      id: "open-source",
+      title: footerMessages.groups.openSource,
+      links: [
+        {
+          label: footerMessages.links.github,
+          href: "https://github.com/GuilhermeAlbert/openings",
+          external: true,
+        },
+        {
+          label: footerMessages.links.contributing,
+          href: "/docs/contributing",
+        },
+        {
+          label: footerMessages.links.reportIssue,
+          href: "https://github.com/GuilhermeAlbert/openings/issues/new",
+          external: true,
+        },
+      ],
+    },
+    {
+      id: "legal",
+      title: footerMessages.groups.legal,
+      links: [
+        { label: footerMessages.links.privacyPolicy, href: "/privacy" },
+        { label: footerMessages.links.termsOfService, href: "/terms" },
+      ],
+    },
+  ];
+
+  const defaultSocialLinks: FooterSocialLink[] = [
+    {
+      label: footerMessages.links.github,
+      href: "https://github.com/GuilhermeAlbert/openings",
+      icon: GithubIcon,
+      external: true,
+      ariaLabel: footerMessages.social.githubAriaLabel,
+    },
+  ];
+
+  const resolvedLinkGroups = linkGroups?.length ? linkGroups : defaultLinkGroups;
+  const resolvedSocialLinks = socialLinks?.length ? socialLinks : defaultSocialLinks;
+  const resolvedBrandTagline = brandTagline ?? footerMessages.brandTagline;
+  const resolvedDescription = description ?? footerMessages.description;
+  const resolvedSupportText = supportText ?? footerMessages.supportText;
+  const resolvedSignature = signature ?? footerMessages.signature;
+  const resolvedSupportEmailButtonLabel =
+    supportEmailButtonLabel ?? footerMessages.supportEmailButtonLabel;
+  const resolvedSupportEmailCopiedMessage =
+    supportEmailCopiedMessage ?? footerMessages.supportEmailCopied;
+  const resolvedSupportEmailCopyErrorMessage =
+    supportEmailCopyErrorMessage ?? footerMessages.supportEmailCopyError;
   const resolvedCopyright =
     copyrightText ??
-    `© ${new Date().getFullYear()} ${brandName}. All rights reserved.`;
+    footerMessages.copyrightTemplate
+      .replace("{year}", year)
+      .replace("{brand}", brandName);
 
   return (
     <footer className={cn(footerRootStyles(), className)}>
@@ -106,8 +126,8 @@ export function Footer({
           <FooterBrand
             href={brandHref}
             brandName={brandName}
-            brandTagline={brandTagline}
-            description={description}
+            brandTagline={resolvedBrandTagline}
+            description={resolvedDescription}
             lightLogoSrc={lightLogoSrc}
             darkLogoSrc={darkLogoSrc}
             socialLinks={resolvedSocialLinks}
@@ -117,9 +137,12 @@ export function Footer({
 
         <FooterBottom
           supportEmail={supportEmail}
-          supportText={supportText}
+          supportEmailButtonLabel={resolvedSupportEmailButtonLabel}
+          supportEmailCopiedMessage={resolvedSupportEmailCopiedMessage}
+          supportEmailCopyErrorMessage={resolvedSupportEmailCopyErrorMessage}
+          supportText={resolvedSupportText}
           copyrightText={resolvedCopyright}
-          signature={signature}
+          signature={resolvedSignature}
         />
       </div>
     </footer>

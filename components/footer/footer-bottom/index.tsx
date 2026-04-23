@@ -2,6 +2,7 @@ import * as React from "react";
 import { motion } from "framer-motion";
 import { Copy, Mail } from "lucide-react";
 import Image from "next/image";
+import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/tailwind";
@@ -18,10 +19,15 @@ import {
 export function FooterBottom({
   className,
   supportEmail,
+  supportEmailButtonLabel,
+  supportEmailCopiedMessage,
+  supportEmailCopyErrorMessage,
   supportText,
   copyrightText,
   signature,
 }: FooterBottomProps) {
+  const { resolvedTheme } = useTheme();
+
   const handleCopySupportEmail = React.useCallback(async () => {
     if (!supportEmail) {
       return;
@@ -29,11 +35,16 @@ export function FooterBottom({
 
     try {
       await navigator.clipboard.writeText(supportEmail);
-      toast.success("Support email copied");
+      toast.success(supportEmailCopiedMessage);
     } catch {
-      toast.error("Could not copy support email");
+      toast.error(supportEmailCopyErrorMessage);
     }
-  }, [supportEmail]);
+  }, [supportEmail, supportEmailCopiedMessage, supportEmailCopyErrorMessage]);
+
+  const signatureLogoSrc =
+    resolvedTheme === "dark"
+      ? "/trebla-solid-white-logo-inline.svg"
+      : "/trebla-solid-primary-logo-inline.svg";
 
   return (
     <motion.div
@@ -56,20 +67,22 @@ export function FooterBottom({
             size="sm"
             onClick={handleCopySupportEmail}
             className={footerSupportButtonStyles()}
+            aria-label={supportEmailButtonLabel}
           >
             <Mail className="size-3.5" aria-hidden="true" />
             <span>{supportEmail}</span>
             <Copy className="size-3.5 opacity-70" aria-hidden="true" />
           </Button>
         ) : null}
+
         <div className="flex items-center gap-2">
-          <p className={footerSignatureStyles()}>Powered by</p>
+          <p className={footerSignatureStyles()}>{signature}</p>
           <Image
-            src="/trebla-solid-white-logo-inline.svg"
-            alt="Trebla Logo"
-            width={60}
+            src={signatureLogoSrc}
+            alt="Trebla logo"
+            width={62}
             height={16}
-            className="opacity-90 dark:invert-0 invert"
+            className="opacity-95"
           />
         </div>
       </div>

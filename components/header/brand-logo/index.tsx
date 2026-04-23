@@ -7,7 +7,6 @@ import type { BrandLogoProps } from "../types";
 import {
   brandLogoMarkStyles,
   brandLogoRootStyles,
-  brandLogoSubtitleStyles,
   brandLogoTextStyles,
   brandLogoTitleStyles,
 } from "./styles";
@@ -16,7 +15,6 @@ export function BrandLogo({
   className,
   href = "/",
   brandName = "openings.dev",
-  brandTagline = "Tech jobs aggregated",
   lightLogoSrc = "/light-mode-favicon.svg",
   darkLogoSrc = "/dark-mode-favicon.svg",
 }: BrandLogoProps) {

@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Languages } from "lucide-react";
 import { toast } from "sonner";
 import {
   Select,

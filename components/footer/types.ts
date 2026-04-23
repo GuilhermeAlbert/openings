@@ -1,4 +1,6 @@
-import type { LucideIcon } from "lucide-react";
+import type { ReactElement, SVGProps } from "react";
+
+type FooterIcon = (props: SVGProps<SVGSVGElement>) => ReactElement;
 
 export interface FooterLink {
   label: string;
@@ -15,7 +17,7 @@ export interface FooterLinkGroup {
 export interface FooterSocialLink {
   label: string;
   href: string;
-  icon: LucideIcon;
+  icon: FooterIcon;
   external?: boolean;
   ariaLabel?: string;
 }
@@ -27,6 +29,9 @@ export interface FooterProps {
   brandTagline?: string;
   description?: string;
   supportEmail?: string;
+  supportEmailButtonLabel?: string;
+  supportEmailCopiedMessage?: string;
+  supportEmailCopyErrorMessage?: string;
   supportText?: string;
   copyrightText?: string;
   signature?: string;
@@ -55,6 +60,9 @@ export interface FooterLinksProps {
 export interface FooterBottomProps {
   className?: string;
   supportEmail?: string;
+  supportEmailButtonLabel: string;
+  supportEmailCopiedMessage: string;
+  supportEmailCopyErrorMessage: string;
   supportText: string;
   copyrightText: string;
   signature: string;
