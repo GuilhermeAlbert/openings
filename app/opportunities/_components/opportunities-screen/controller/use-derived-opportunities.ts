@@ -1,0 +1,99 @@
+import * as React from "react";
+import { buildFilterOptions } from "./build-filter-options";
+import { getActiveFiltersCount } from "./active-filters";
+import { buildRangeLabel } from "./range-label";
+import { getFilteredOpportunities } from "./filtering";
+import { normalizeFilters } from "./normalize-filters";
+import type {
+  OpportunityFiltersState,
+  OpportunityItem,
+} from "@/app/opportunities/_components/opportunities-screen/types";
+
+interface UseDerivedOpportunitiesParams {
+  opportunities: OpportunityItem[];
+  filters: OpportunityFiltersState;
+  selectedOpportunityId: string | null;
+  forcedRepository: string | null;
+  forcedAuthor: string | null;
+  locale: string;
+  rangeMessages: { zeroResults: string; rangeOfTotal: string };
+}
+
+export function useDerivedOpportunities(params: UseDerivedOpportunitiesParams) {
+  const openOpportunities = React.useMemo(
+    () => params.opportunities.filter((item) => item.issueState === "open"),
+    [params.opportunities],
+  );
+  const options = React.useMemo(
+    () => buildFilterOptions(openOpportunities),
+    [openOpportunities],
+  );
+  const normalizedFilters = React.useMemo(
+    () =>
+      normalizeFilters(
+        params.filters,
+        options,
+        params.forcedRepository,
+        params.forcedAuthor,
+      ),
+    [options, params.filters, params.forcedAuthor, params.forcedRepository],
+  );
+  const filteredOpportunities = React.useMemo(
+    () => getFilteredOpportunities(params.opportunities, normalizedFilters),
+    [normalizedFilters, params.opportunities],
+  );
+  const totalCount = filteredOpportunities.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / normalizedFilters.itemsPerPage));
+  const currentPage = Math.min(normalizedFilters.page, totalPages);
+  const visibleOpportunities = React.useMemo(() => {
+    const end = currentPage * normalizedFilters.itemsPerPage;
+    return filteredOpportunities.slice(0, end);
+  }, [currentPage, filteredOpportunities, normalizedFilters.itemsPerPage]);
+  const selectedOpportunity = React.useMemo(
+    () => filteredOpportunities.find((item) => item.id === params.selectedOpportunityId) ?? null,
+    [filteredOpportunities, params.selectedOpportunityId],
+  );
+  const rangeLabel = React.useMemo(
+    () =>
+      buildRangeLabel({
+        totalCount,
+        currentPage,
+        itemsPerPage: normalizedFilters.itemsPerPage,
+        locale: params.locale,
+        zeroResultsLabel: params.rangeMessages.zeroResults,
+        rangeTemplate: params.rangeMessages.rangeOfTotal,
+      }),
+    [
+      currentPage,
+      normalizedFilters.itemsPerPage,
+      params.locale,
+      params.rangeMessages.rangeOfTotal,
+      params.rangeMessages.zeroResults,
+      totalCount,
+    ],
+  );
+  const activeFiltersCount = React.useMemo(
+    () =>
+      getActiveFiltersCount(
+        normalizedFilters,
+        params.forcedRepository,
+        params.forcedAuthor,
+      ),
+    [normalizedFilters, params.forcedAuthor, params.forcedRepository],
+  );
+
+  return {
+    options,
+    normalizedFilters,
+    filteredOpportunities,
+    visibleOpportunities,
+    selectedOpportunity,
+    activeFiltersCount,
+    totalCount,
+    totalPages,
+    currentPage,
+    hasActiveFilters: activeFiltersCount > 0,
+    isDetailsOpen: Boolean(selectedOpportunity),
+    rangeLabel,
+  };
+}

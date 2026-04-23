@@ -1,4 +1,4 @@
-import { OpportunitiesPage } from "@/components/opportunities-page";
+import { OpportunitiesPage } from "@/app/opportunities/_components/opportunities-page";
 
 export default function UsersIndexPage() {
   return <OpportunitiesPage />;
