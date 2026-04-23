@@ -4,7 +4,6 @@ import * as React from "react";
 import Image from "next/image";
 import {
   Building2,
-  CircleDot,
   CalendarDays,
   Landmark,
   MapPin,
@@ -13,6 +12,7 @@ import {
 import { useI18n } from "@/components/providers/i18n-provider";
 import { cn } from "@/lib/utils/tailwind";
 import {
+  cardPersonButtonStyles,
   chipStyles,
   metadataRowStyles,
   opportunityCardStyles,
@@ -34,11 +34,7 @@ function formatTemplate(
 function formatSalary(
   salary: OpportunitySalary | undefined,
   locale: string,
-  periodLabels: {
-    month: string;
-    year: string;
-    hour: string;
-  },
+  periodLabels: { month: string; year: string; hour: string },
 ) {
   if (!salary || (!salary.min && !salary.max)) {
     return "";
@@ -52,7 +48,7 @@ function formatSalary(
   const period = periodLabels[salary.period];
 
   if (salary.min && salary.max) {
-    return `${formatter.format(salary.min)} - ${formatter.format(salary.max)} / ${period}`;
+    return `${formatter.format(salary.min)} – ${formatter.format(salary.max)} / ${period}`;
   }
 
   if (salary.min) {
@@ -79,6 +75,13 @@ export function OpportunityCard({
       }),
     [locale],
   );
+
+  const salaryLabel = formatSalary(item.salary, locale, {
+    month: cardMessages.salaryPeriodMonth,
+    year: cardMessages.salaryPeriodYear,
+    hour: cardMessages.salaryPeriodHour,
+  });
+
   return (
     <article
       className={cn(opportunityCardStyles({ viewMode, selected: isSelected }))}
@@ -93,114 +96,114 @@ export function OpportunityCard({
         }
       }}
     >
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-              <CircleDot className="size-3.5" />
-              {cardMessages.statusOpen}
-            </div>
-            <p className="text-base font-semibold tracking-[-0.01em] text-foreground transition-colors group-hover:text-muted-foreground">
-              {item.title}
-            </p>
-            <p className="max-w-[62ch] text-sm leading-6 text-muted-foreground">
-              {item.excerpt}
-            </p>
+      <div className="flex h-full flex-col gap-3">
+        {/* Title + excerpt */}
+        <div className="space-y-1.5">
+          <p className="text-base font-semibold tracking-[-0.01em] text-foreground">
+            {item.title}
+          </p>
+          <p className="line-clamp-2 max-w-[62ch] text-sm leading-6 text-muted-foreground">
+            {item.excerpt}
+          </p>
+        </div>
+
+        {/* Tags */}
+        {item.tags.length > 0 ? (
+          <div className="flex flex-wrap gap-1">
+            {item.tags.map((tag) => (
+              <span key={tag} className={chipStyles({ active: false })}>
+                {tag}
+              </span>
+            ))}
           </div>
-        </div>
+        ) : null}
 
-        <div className="flex flex-wrap gap-1.5">
-          {item.tags.map((tag) => (
-            <span key={tag} className={chipStyles({ active: false })}>
-              {tag}
-            </span>
-          ))}
-        </div>
-
+        {/* Metadata */}
         <div className={metadataRowStyles()}>
-          {item.salary ? (
+          {salaryLabel ? (
             <span className="inline-flex items-center gap-1">
               <Wallet className="size-3.5" />
-              {formatSalary(item.salary, locale, {
-                month: cardMessages.salaryPeriodMonth,
-                year: cardMessages.salaryPeriodYear,
-                hour: cardMessages.salaryPeriodHour,
-              })}
+              {salaryLabel}
             </span>
           ) : null}
-
           {item.companyName ? (
             <span className="inline-flex items-center gap-1">
               <Building2 className="size-3.5" />
               {item.companyName}
             </span>
           ) : null}
-
           <span className="inline-flex items-center gap-1">
             <Landmark className="size-3.5" />
             {item.community.repository}
           </span>
-
           <span className="inline-flex items-center gap-1">
             <MapPin className="size-3.5" />
             {item.country}
           </span>
-
           <span className="inline-flex items-center gap-1">
             <CalendarDays className="size-3.5" />
             {dateFormatter.format(new Date(item.createdAt))}
           </span>
         </div>
-      </div>
 
-      <div className="mt-4 flex items-center justify-between gap-4 border-t border-border/65 pt-3">
-        <button
-          type="button"
-          className="flex items-center gap-3 rounded-md p-1 -m-1 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
-          onClick={(event) => {
-            event.stopPropagation();
-            event.preventDefault();
-            onCommunitySelect(item.repository);
-          }}
-        >
-          <Image
-            src={item.community.avatarUrl}
-            alt={formatTemplate(cardMessages.communityAvatarAlt, {
-              name: item.community.name,
-            })}
-            width={28}
-            height={28}
-            className="size-7 rounded-full border border-border/70 bg-muted object-cover"
-          />
-          <div className="space-y-0.5">
-            <p className="text-xs font-medium text-foreground">{item.community.name}</p>
-            <p className="text-xs text-muted-foreground">{item.repository}</p>
-          </div>
-        </button>
+        {/* Footer */}
+        <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/50 pt-2.5">
+          <button
+            type="button"
+            className={cardPersonButtonStyles()}
+            onClick={(event) => {
+              event.stopPropagation();
+              event.preventDefault();
+              onCommunitySelect(item.repository);
+            }}
+          >
+            <Image
+              src={item.community.avatarUrl}
+              alt={formatTemplate(cardMessages.communityAvatarAlt, {
+                name: item.community.name,
+              })}
+              width={24}
+              height={24}
+              className="size-6 rounded-full border border-border/60 bg-muted object-cover"
+            />
+            <div>
+              <p className="text-xs font-medium leading-none text-foreground">
+                {item.community.name}
+              </p>
+              <p className="mt-0.5 text-[11px] leading-none text-muted-foreground">
+                {item.repository}
+              </p>
+            </div>
+          </button>
 
-        <button
-          type="button"
-          className="flex items-center gap-2 rounded-md p-1 -m-1 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
-          onClick={(event) => {
-            event.stopPropagation();
-            event.preventDefault();
-            onAuthorSelect(item.author.handle);
-          }}
-        >
-          <div className="text-right">
-            <p className="text-xs font-medium text-foreground">{item.author.name}</p>
-            <p className="text-xs text-muted-foreground">@{item.author.handle}</p>
-          </div>
-          <Image
-            src={item.author.avatarUrl}
-            alt={formatTemplate(cardMessages.authorAvatarAlt, {
-              name: item.author.name,
-            })}
-            width={28}
-            height={28}
-            className="size-7 rounded-full border border-border/70 bg-muted object-cover"
-          />
-        </button>
+          <button
+            type="button"
+            className={cardPersonButtonStyles()}
+            onClick={(event) => {
+              event.stopPropagation();
+              event.preventDefault();
+              onAuthorSelect(item.author.handle);
+            }}
+          >
+            <div className="text-right">
+              <p className="text-xs font-medium leading-none text-foreground">
+                {item.author.name}
+              </p>
+              <p className="mt-0.5 text-[11px] leading-none text-muted-foreground">
+                @{item.author.handle}
+              </p>
+            </div>
+            <Image
+              src={item.author.avatarUrl}
+              alt={formatTemplate(cardMessages.authorAvatarAlt, {
+                name: item.author.name,
+              })}
+              width={24}
+              height={24}
+              className="size-6 rounded-full border border-border/60 bg-muted object-cover"
+            />
+          </button>
+        </div>
       </div>
     </article>
   );

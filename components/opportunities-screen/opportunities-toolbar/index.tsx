@@ -12,7 +12,7 @@ import { useI18n } from "@/components/providers/i18n-provider";
 import { cn } from "@/lib/utils/tailwind";
 import {
   compactSelectTriggerStyles,
-  panelStyles,
+  controlBarStyles,
 } from "@/components/opportunities-screen/styles";
 import type {
   OpportunitiesToolbarProps,
@@ -31,11 +31,8 @@ function formatTemplate(
 
 export function OpportunitiesToolbar({
   totalCount,
-  rangeLabel,
   sortOrder,
   viewMode,
-  currentPage,
-  totalPages,
   onSortOrderChange,
   onViewModeChange,
 }: OpportunitiesToolbarProps) {
@@ -43,50 +40,41 @@ export function OpportunitiesToolbar({
   const toolbarMessages = messages.opportunities.toolbar;
 
   return (
-    <section className={cn(panelStyles(), "flex flex-col gap-4")}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-foreground">
-            {formatTemplate(toolbarMessages.opportunitiesCount, {
-              count: totalCount.toLocaleString(locale),
-            })}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {formatTemplate(toolbarMessages.pageSummary, {
-              range: rangeLabel,
-              page: currentPage.toLocaleString(locale),
-              totalPages: totalPages.toLocaleString(locale),
-            })}
-          </p>
-        </div>
+    <div className={controlBarStyles()}>
+      <p className="tabular-nums text-sm font-medium text-foreground">
+        {formatTemplate(toolbarMessages.opportunitiesCount, {
+          count: totalCount.toLocaleString(locale),
+        })}
+      </p>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-2 rounded-lg border border-border/80 bg-muted/35 px-2 py-1.5">
-            <ArrowDownUp className="size-4 text-muted-foreground" />
-            <Select
-              value={sortOrder}
-              onValueChange={(value) =>
-                onSortOrderChange(value as OpportunitySortOrder)
-              }
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 text-muted-foreground">
+          <ArrowDownUp className="size-3.5 shrink-0" />
+          <Select
+            value={sortOrder}
+            onValueChange={(value) =>
+              onSortOrderChange(value as OpportunitySortOrder)
+            }
+          >
+            <SelectTrigger
+              className={cn(
+                compactSelectTriggerStyles(),
+                "h-7 min-w-28 border-none bg-transparent px-1 text-xs shadow-none focus-visible:ring-0 focus-visible:ring-offset-0",
+              )}
             >
-              <SelectTrigger
-                className={cn(
-                  compactSelectTriggerStyles(),
-                  "h-7 min-w-36 border-none bg-transparent px-1 text-xs shadow-none focus-visible:ring-0 focus-visible:ring-offset-0",
-                )}
-              >
-                <SelectValue placeholder={toolbarMessages.sortPlaceholder} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="recent">{toolbarMessages.sortRecent}</SelectItem>
-                <SelectItem value="oldest">{toolbarMessages.sortOldest}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <ViewModeToggle value={viewMode} onChange={onViewModeChange} />
+              <SelectValue placeholder={toolbarMessages.sortPlaceholder} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="recent">{toolbarMessages.sortRecent}</SelectItem>
+              <SelectItem value="oldest">{toolbarMessages.sortOldest}</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+
+        <span className="h-4 w-px bg-border/60" aria-hidden />
+
+        <ViewModeToggle value={viewMode} onChange={onViewModeChange} />
       </div>
-    </section>
+    </div>
   );
 }

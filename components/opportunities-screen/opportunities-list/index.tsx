@@ -26,20 +26,20 @@ function OpportunitySkeleton({ compact }: { compact: boolean }) {
   return (
     <div
       className={cn(
-        "h-full rounded-xl border border-border/75 bg-card/75 p-4",
+        "h-full rounded-xl border border-border/60 bg-card/70 p-4",
         compact ? "min-h-56" : "min-h-52",
       )}
     >
       <div className="animate-pulse space-y-3">
         <div className="h-4 w-3/5 rounded bg-muted" />
-        <div className="h-3 w-full rounded bg-muted/80" />
-        <div className="h-3 w-4/5 rounded bg-muted/80" />
-        <div className="flex gap-2">
-          <div className="h-5 w-16 rounded-full bg-muted" />
-          <div className="h-5 w-20 rounded-full bg-muted" />
-          <div className="h-5 w-14 rounded-full bg-muted" />
+        <div className="h-3 w-full rounded bg-muted/70" />
+        <div className="h-3 w-4/5 rounded bg-muted/70" />
+        <div className="flex gap-1.5">
+          <div className="h-5 w-14 rounded-md bg-muted" />
+          <div className="h-5 w-18 rounded-md bg-muted" />
+          <div className="h-5 w-12 rounded-md bg-muted" />
         </div>
-        <div className="h-3 w-2/3 rounded bg-muted/80" />
+        <div className="h-3 w-2/3 rounded bg-muted/70" />
       </div>
     </div>
   );
@@ -93,14 +93,7 @@ export function OpportunitiesList({
 
   return (
     <section className={cn(panelStyles(), "space-y-4")}>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-muted-foreground">{rangeLabel}</p>
-        <p className="text-xs text-muted-foreground">
-          {formatTemplate(listMessages.totalMatches, {
-            count: totalCount.toLocaleString(locale),
-          })}
-        </p>
-      </div>
+      <p className="text-sm text-muted-foreground">{rangeLabel}</p>
 
       {isLoading ? (
         <div className={resultsGridStyles({ viewMode })}>
@@ -109,8 +102,8 @@ export function OpportunitiesList({
           ))}
         </div>
       ) : items.length === 0 ? (
-        <div className="flex min-h-56 flex-col items-center justify-center rounded-xl border border-dashed border-border/75 bg-muted/25 px-4 text-center">
-          <div className="mb-3 inline-flex size-9 items-center justify-center rounded-full border border-border/70 bg-background/60 text-muted-foreground">
+        <div className="flex min-h-56 flex-col items-center justify-center rounded-xl border border-dashed border-border/60 bg-muted/15 px-4 text-center">
+          <div className="mb-3 inline-flex size-9 items-center justify-center rounded-full border border-border/60 bg-background/60 text-muted-foreground">
             <SearchX className="size-4" />
           </div>
           <h3 className="text-sm font-semibold text-foreground">
@@ -166,7 +159,7 @@ export function OpportunitiesList({
       )}
 
       {items.length > 0 ? (
-        <div className="space-y-3 border-t border-border/70 pt-3">
+        <div className="space-y-3 border-t border-border/60 pt-3">
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground">
               {formatTemplate(listMessages.loadedPage, {
