@@ -15,8 +15,8 @@ export function BrandLogo({
   className,
   href = "/",
   brandName = "openings.dev",
-  lightLogoSrc = "/brand-mark-light.svg",
-  darkLogoSrc = "/brand-mark-dark.svg",
+  lightLogoSrc = "/light-mode-favicon.svg",
+  darkLogoSrc = "/dark-mode-favicon.svg",
 }: BrandLogoProps) {
   return (
     <Link href={href} className={cn(brandLogoRootStyles(), className)}>

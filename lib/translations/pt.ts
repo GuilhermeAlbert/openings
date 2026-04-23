@@ -9,6 +9,11 @@ export const ptTranslations: TranslationMessages = {
   header: {
     brandName: "openings.dev",
     brandTagline: "Inteligência de vagas movida por comunidades",
+    nav: {
+      discover: "Descobrir",
+      communities: "Comunidades",
+      users: "Usuários",
+    },
     languagePlaceholder: "Idioma",
     languageAriaLabel: "Selecionar idioma",
     languageChanged: "Idioma alterado para {language}.",
@@ -28,10 +33,10 @@ export const ptTranslations: TranslationMessages = {
     },
     feedback: {
       filtersReset: "Filtros redefinidos",
-      loadError: "Não foi possível carregar vagas ao vivo do GitHub.",
-      loadMoreError: "Não foi possível carregar mais vagas do GitHub.",
+      loadError: "Não foi possível carregar vagas da fonte de dados.",
+      loadMoreError: "Não foi possível carregar mais vagas da fonte de dados.",
       rateLimited:
-        "Limite da API do GitHub atingido. Aguarde alguns minutos e tente novamente.",
+        "A fonte de dados está temporariamente indisponível. Aguarde alguns minutos e tente novamente.",
     },
     range: {
       zeroResults: "0 resultados",
@@ -122,6 +127,8 @@ export const ptTranslations: TranslationMessages = {
     },
     links: {
       overview: "Visão geral",
+      communities: "Comunidades",
+      users: "Usuários",
       apiReference: "Referência da API",
       status: "Status",
       github: "GitHub",

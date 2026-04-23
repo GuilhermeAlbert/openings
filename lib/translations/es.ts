@@ -9,6 +9,11 @@ export const esTranslations: TranslationMessages = {
   header: {
     brandName: "openings.dev",
     brandTagline: "Inteligencia laboral impulsada por comunidades",
+    nav: {
+      discover: "Descubrir",
+      communities: "Comunidades",
+      users: "Usuarios",
+    },
     languagePlaceholder: "Idioma",
     languageAriaLabel: "Seleccionar idioma",
     languageChanged: "Idioma actualizado a {language}.",
@@ -29,10 +34,11 @@ export const esTranslations: TranslationMessages = {
     },
     feedback: {
       filtersReset: "Filtros restablecidos",
-      loadError: "No se pudieron cargar oportunidades en vivo desde GitHub.",
-      loadMoreError: "No se pudieron cargar más oportunidades desde GitHub.",
+      loadError: "No se pudieron cargar oportunidades desde la fuente de datos.",
+      loadMoreError:
+        "No se pudieron cargar más oportunidades desde la fuente de datos.",
       rateLimited:
-        "Se alcanzó el límite de la API de GitHub. Espera unos minutos e inténtalo de nuevo.",
+        "La fuente de datos no está disponible temporalmente. Espera unos minutos e inténtalo de nuevo.",
     },
     range: {
       zeroResults: "0 resultados",
@@ -123,6 +129,8 @@ export const esTranslations: TranslationMessages = {
     },
     links: {
       overview: "Resumen",
+      communities: "Comunidades",
+      users: "Usuarios",
       apiReference: "Referencia de API",
       status: "Estado",
       github: "GitHub",

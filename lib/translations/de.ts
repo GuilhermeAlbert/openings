@@ -8,6 +8,11 @@ export const deTranslations: TranslationMessages = {
   header: {
     brandName: "openings.dev",
     brandTagline: "Community-getriebene Job-Intelligence",
+    nav: {
+      discover: "Entdecken",
+      communities: "Communities",
+      users: "Nutzer",
+    },
     languagePlaceholder: "Sprache",
     languageAriaLabel: "Sprache auswählen",
     languageChanged: "Sprache auf {language} geändert.",
@@ -27,11 +32,11 @@ export const deTranslations: TranslationMessages = {
     },
     feedback: {
       filtersReset: "Filter zurückgesetzt",
-      loadError: "Live-Opportunities von GitHub konnten nicht geladen werden.",
+      loadError: "Opportunities aus der Datenquelle konnten nicht geladen werden.",
       loadMoreError:
-        "Weitere Opportunities von GitHub konnten nicht geladen werden.",
+        "Weitere Opportunities aus der Datenquelle konnten nicht geladen werden.",
       rateLimited:
-        "GitHub-API-Limit erreicht. Bitte in ein paar Minuten erneut versuchen.",
+        "Die Datenquelle ist vorübergehend nicht verfügbar. Bitte in ein paar Minuten erneut versuchen.",
     },
     range: {
       zeroResults: "0 Ergebnisse",
@@ -122,6 +127,8 @@ export const deTranslations: TranslationMessages = {
     },
     links: {
       overview: "Überblick",
+      communities: "Communities",
+      users: "Nutzer",
       apiReference: "API-Referenz",
       status: "Status",
       github: "GitHub",

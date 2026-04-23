@@ -6,6 +6,7 @@ import { useI18n } from "@/components/providers/i18n-provider";
 import { AVAILABLE_LOCALES } from "@/lib/constants/locales";
 import { cn } from "@/lib/utils/tailwind";
 import { BrandLogo } from "./brand-logo";
+import { HeaderNav } from "./header-nav";
 import { LanguageSwitcher } from "./language-switcher";
 import {
   headerActionsStyles,
@@ -26,6 +27,11 @@ export function Header({
   const { locale: currentLocale, messages, setLocale } = useI18n();
   const activeLocale = locale ?? currentLocale;
   const availableLocales = locales?.length ? locales : AVAILABLE_LOCALES;
+  const navItems = [
+    { label: messages.header.nav.discover, href: "/" },
+    { label: messages.header.nav.communities, href: "/community" },
+    { label: messages.header.nav.users, href: "/users" },
+  ];
 
   const handleLocaleChange = React.useCallback(
     (nextLocale: LocaleCode) => {
@@ -51,6 +57,7 @@ export function Header({
       <div className={headerContainerStyles()}>
         <div className="flex items-center gap-6">
           <BrandLogo href={logoHref} brandName={messages.header.brandName} />
+          <HeaderNav items={navItems} />
         </div>
         <div className={headerActionsStyles()}>
           <ThemeToggle />

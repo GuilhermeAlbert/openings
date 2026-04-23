@@ -1,48 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { REPOSITORIES, type RepositoryConfig } from "@/lib/constants/repositories";
 import type {
   OpportunityItem,
   OpportunitySalary,
+  OpportunitySourceType,
 } from "@/components/opportunities-screen/types";
 
-const GITHUB_ISSUES_PER_PAGE = 30;
-const MAX_BATCH_LIMIT = 80;
-const MULTI_REPOSITORY_TAKE = 4;
+const DEFAULT_LIMIT = 40;
+const MIN_LIMIT = 10;
+const MAX_LIMIT = 80;
+const SNAPSHOT_REVALIDATE_SECONDS = 300;
+const DEFAULT_SNAPSHOT_URL =
+  "https://raw.githubusercontent.com/openings-dev/data/main/snapshots/opportunities.json";
 
-type SortDirection = "asc" | "desc";
+type SortOrder = "recent" | "oldest";
 
 interface CursorState {
-  repoIndex: number;
-  issuePage: number;
+  offset: number;
 }
 
-interface GitHubUser {
-  login: string;
-  avatar_url: string;
-}
-
-interface GitHubLabelObject {
-  name: string;
-}
-
-type GitHubLabel = string | GitHubLabelObject;
-
-interface GitHubIssue {
-  id: number;
-  number: number;
-  title: string;
-  body: string | null;
-  state: "open" | "closed";
-  html_url: string;
-  created_at: string;
-  updated_at: string;
-  user: GitHubUser;
-  labels: GitHubLabel[];
-  pull_request?: unknown;
-}
-
-interface RepositoryIssuesResponse {
-  issues: GitHubIssue[];
+interface OpportunitiesApiPayload {
+  items: OpportunityItem[];
+  nextCursor: string | null;
+  hasMore: boolean;
   rateLimited: boolean;
   retryAfterSeconds: number | null;
 }
@@ -55,36 +34,33 @@ function parseLimit(value: string | null) {
   const parsed = Number.parseInt(value ?? "", 10);
 
   if (!Number.isFinite(parsed)) {
-    return 40;
+    return DEFAULT_LIMIT;
   }
 
-  return clamp(parsed, 10, MAX_BATCH_LIMIT);
+  return clamp(parsed, MIN_LIMIT, MAX_LIMIT);
+}
+
+function normalizeSortOrder(value: string | null): SortOrder {
+  return value === "oldest" ? "oldest" : "recent";
 }
 
 function decodeCursor(rawCursor: string | null): CursorState {
   if (!rawCursor) {
-    return { repoIndex: 0, issuePage: 1 };
+    return { offset: 0 };
   }
 
   try {
     const payload = JSON.parse(
       Buffer.from(rawCursor, "base64url").toString("utf8"),
     ) as Partial<CursorState>;
-    const repoIndex =
-      typeof payload.repoIndex === "number" && Number.isInteger(payload.repoIndex)
-        ? payload.repoIndex
+    const offset =
+      typeof payload.offset === "number" && Number.isInteger(payload.offset)
+        ? payload.offset
         : 0;
-    const issuePage =
-      typeof payload.issuePage === "number" && Number.isInteger(payload.issuePage)
-        ? payload.issuePage
-        : 1;
 
-    return {
-      repoIndex: clamp(repoIndex, 0, Number.MAX_SAFE_INTEGER),
-      issuePage: clamp(issuePage, 1, Number.MAX_SAFE_INTEGER),
-    };
+    return { offset: clamp(offset, 0, Number.MAX_SAFE_INTEGER) };
   } catch {
-    return { repoIndex: 0, issuePage: 1 };
+    return { offset: 0 };
   }
 }
 
@@ -92,457 +68,263 @@ function encodeCursor(cursor: CursorState) {
   return Buffer.from(JSON.stringify(cursor), "utf8").toString("base64url");
 }
 
-function normalizeSortDirection(value: string | null): SortDirection {
-  return value === "oldest" ? "asc" : "desc";
-}
-
-function normalizeText(text: string) {
-  return text.replace(/\s+/g, " ").trim();
-}
-
-function buildExcerpt(title: string, body: string | null) {
-  const source = normalizeText(body ?? "");
-
-  if (!source) {
-    return title;
-  }
-
-  if (source.length <= 220) {
-    return source;
-  }
-
-  return `${source.slice(0, 217)}...`;
-}
-
-function resolveLabelName(label: GitHubLabel) {
-  if (typeof label === "string") {
-    return label;
-  }
-
-  return label.name;
-}
-
-function extractTags(issue: GitHubIssue) {
-  const labels = issue.labels
-    .map(resolveLabelName)
-    .map((name) => normalizeText(name).toLowerCase())
-    .filter(Boolean);
-
-  if (labels.length > 0) {
-    return Array.from(new Set(labels)).slice(0, 8);
-  }
-
-  const text = normalizeText(`${issue.title} ${issue.body ?? ""}`).toLowerCase();
-  const dictionary = [
-    "remote",
-    "hybrid",
-    "onsite",
-    "frontend",
-    "backend",
-    "fullstack",
-    "react",
-    "nextjs",
-    "typescript",
-    "node",
-    "python",
-    "golang",
-    "java",
-    "senior",
-    "junior",
-    "pleno",
-    "staff",
-    "principal",
-    "devops",
-    "data",
-    "design",
-  ];
-
-  return dictionary.filter((tag) => text.includes(tag)).slice(0, 8);
-}
-
-function parseCurrency(token: string, repository: RepositoryConfig) {
-  const normalized = token.toUpperCase();
-
-  if (normalized === "R$" || normalized === "BRL") {
-    return "BRL";
-  }
-
-  if (normalized === "€" || normalized === "EUR") {
-    return "EUR";
-  }
-
-  if (normalized === "£" || normalized === "GBP") {
-    return "GBP";
-  }
-
-  if (normalized === "CAD") {
-    return "CAD";
-  }
-
-  if (normalized === "USD" || normalized === "US$") {
-    return "USD";
-  }
-
-  if (normalized === "$") {
-    if (repository.countryCode === "CA") {
-      return "CAD";
-    }
-
-    if (repository.countryCode === "BR") {
-      return "BRL";
-    }
-
-    return "USD";
-  }
-
-  return null;
-}
-
-function parseAmount(rawValue: string) {
-  const value = rawValue.trim().toLowerCase();
-  const hasK = value.endsWith("k");
-  const hasM = value.endsWith("m");
-  const base = value.replace(/[km]$/, "").replace(/\s+/g, "");
-  const standardized = base
-    .replace(/\.(?=\d{3}(\D|$))/g, "")
-    .replace(/,(?=\d{3}(\D|$))/g, "")
-    .replace(",", ".");
-  const parsed = Number.parseFloat(standardized);
-
-  if (!Number.isFinite(parsed)) {
+function asRecord(value: unknown) {
+  if (!value || typeof value !== "object") {
     return null;
   }
 
-  const multiplier = hasM ? 1_000_000 : hasK ? 1_000 : 1;
-  return Math.round(parsed * multiplier);
+  return value as Record<string, unknown>;
 }
 
-function detectSalaryPeriod(text: string): OpportunitySalary["period"] {
-  const lower = text.toLowerCase();
-
-  if (/(hour|hr|hora|\/h)/i.test(lower)) {
-    return "hour";
-  }
-
-  if (/(month|monthly|mês|mes|\/m)/i.test(lower)) {
-    return "month";
-  }
-
-  return "year";
+function stringOrNull(value: unknown) {
+  return typeof value === "string" && value.trim().length > 0 ? value : null;
 }
 
-function parseSalary(text: string, repository: RepositoryConfig) {
-  const content = normalizeText(text);
-
-  const rangeMatch = content.match(
-    /(R\$|US\$|USD|BRL|EUR|CAD|€|\$|£)\s*([0-9][0-9.,\s]*[kKmM]?)\s*(?:-|–|—|to|a|até)\s*(?:R\$|US\$|USD|BRL|EUR|CAD|€|\$|£)?\s*([0-9][0-9.,\s]*[kKmM]?)/i,
-  );
-
-  if (rangeMatch) {
-    const currency = parseCurrency(rangeMatch[1], repository);
-    const min = parseAmount(rangeMatch[2]);
-    const max = parseAmount(rangeMatch[3]);
-
-    if (currency && min && max) {
-      return {
-        currency,
-        min: Math.min(min, max),
-        max: Math.max(min, max),
-        period: detectSalaryPeriod(content),
-      } satisfies OpportunitySalary;
-    }
+function normalizeSourceType(value: unknown): OpportunitySourceType {
+  if (
+    value === "github-discussion" ||
+    value === "community-board" ||
+    value === "github-issue"
+  ) {
+    return value;
   }
 
-  const singleMatch = content.match(
-    /(?:salary|sal[aá]rio|compensation|pay|faixa)[^\dRUSBECAD€$£]{0,24}(R\$|US\$|USD|BRL|EUR|CAD|€|\$|£)\s*([0-9][0-9.,\s]*[kKmM]?)/i,
-  );
-
-  if (singleMatch) {
-    const currency = parseCurrency(singleMatch[1], repository);
-    const amount = parseAmount(singleMatch[2]);
-
-    if (currency && amount) {
-      return {
-        currency,
-        min: amount,
-        period: detectSalaryPeriod(content),
-      } satisfies OpportunitySalary;
-    }
-  }
-
-  return undefined;
+  return "github-issue";
 }
 
-function parseCompanyName(title: string, body: string | null) {
-  const source = `${title}\n${body ?? ""}`;
-  const labeledMatch = source.match(
-    /(?:company|empresa|companhia|cliente)\s*[:|-]\s*([^\n|]{2,80})/i,
-  );
+function normalizeSalary(value: unknown): OpportunitySalary | undefined {
+  const record = asRecord(value);
 
-  if (labeledMatch) {
-    const normalized = normalizeText(labeledMatch[1]);
-    return normalized.length <= 64 ? normalized : undefined;
+  if (!record) {
+    return undefined;
   }
 
-  const titleAtMatch = title.match(/\b(?:at|na|no)\s+([A-Za-z0-9&.'\- ]{2,64})$/i);
+  const currency = stringOrNull(record.currency);
 
-  if (titleAtMatch) {
-    return normalizeText(titleAtMatch[1]);
+  if (!currency) {
+    return undefined;
   }
 
-  return undefined;
-}
+  const period =
+    record.period === "month" || record.period === "hour" || record.period === "year"
+      ? record.period
+      : "year";
 
-function mapIssueToOpportunity(issue: GitHubIssue, repository: RepositoryConfig) {
-  const body = issue.body ?? "";
-  const combinedText = `${issue.title}\n${body}`;
-  const salary = parseSalary(combinedText, repository);
+  const min = typeof record.min === "number" && Number.isFinite(record.min)
+    ? record.min
+    : undefined;
+  const max = typeof record.max === "number" && Number.isFinite(record.max)
+    ? record.max
+    : undefined;
 
   return {
-    id: `${repository.repository}#${issue.number}`,
-    title: issue.title,
-    excerpt: buildExcerpt(issue.title, issue.body),
-    issueState: issue.state,
-    repository: repository.repository,
-    repositoryUrl: repository.url,
-    region: repository.region,
-    country: repository.country,
-    tags: extractTags(issue),
-    author: {
-      id: issue.user.login,
-      name: issue.user.login,
-      handle: issue.user.login,
-      avatarUrl: issue.user.avatar_url,
-    },
-    community: {
-      id: repository.owner,
-      name: repository.owner,
-      avatarUrl: `https://github.com/${repository.owner}.png?size=80`,
-      repository: repository.repository,
-      url: repository.url,
-    },
-    companyName: parseCompanyName(issue.title, issue.body),
-    salary,
-    createdAt: issue.created_at,
-    updatedAt: issue.updated_at,
-    url: issue.html_url,
-    sourceType: "github-issue",
-  } satisfies OpportunityItem;
-}
-
-function getGitHubHeaders() {
-  const token =
-    process.env.GITHUB_TOKEN ||
-    process.env.GITHUB_API_TOKEN ||
-    process.env.OPENINGS_GITHUB_TOKEN;
-
-  return {
-    Accept: "application/vnd.github+json",
-    "User-Agent": "openings.dev",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    currency,
+    period,
+    ...(min !== undefined ? { min } : {}),
+    ...(max !== undefined ? { max } : {}),
   };
 }
 
-function parseRetryAfterSeconds(response: Response) {
-  const retryAfterHeader = response.headers.get("retry-after");
+function normalizeOpportunity(value: unknown): OpportunityItem | null {
+  const record = asRecord(value);
 
-  if (retryAfterHeader) {
-    const asNumber = Number.parseInt(retryAfterHeader, 10);
-
-    if (Number.isFinite(asNumber) && asNumber > 0) {
-      return asNumber;
-    }
-  }
-
-  const resetHeader = response.headers.get("x-ratelimit-reset");
-
-  if (!resetHeader) {
+  if (!record) {
     return null;
   }
 
-  const resetEpoch = Number.parseInt(resetHeader, 10);
+  const id = stringOrNull(record.id);
+  const title = stringOrNull(record.title);
+  const repository = stringOrNull(record.repository);
+  const repositoryUrl = stringOrNull(record.repositoryUrl);
+  const region = stringOrNull(record.region);
+  const country = stringOrNull(record.country);
+  const url = stringOrNull(record.url);
+  const createdAt = stringOrNull(record.createdAt);
+  const updatedAt = stringOrNull(record.updatedAt) ?? createdAt;
 
-  if (!Number.isFinite(resetEpoch) || resetEpoch <= 0) {
+  if (
+    !id ||
+    !title ||
+    !repository ||
+    !repositoryUrl ||
+    !region ||
+    !country ||
+    !url ||
+    !createdAt ||
+    !updatedAt
+  ) {
     return null;
   }
 
-  const nowEpoch = Math.floor(Date.now() / 1000);
-  const deltaSeconds = resetEpoch - nowEpoch;
-  return deltaSeconds > 0 ? deltaSeconds : null;
-}
+  const authorRecord = asRecord(record.author) ?? {};
+  const authorHandle =
+    stringOrNull(authorRecord.handle) ??
+    stringOrNull(authorRecord.name) ??
+    stringOrNull(authorRecord.id) ??
+    "unknown";
+  const authorId = stringOrNull(authorRecord.id) ?? authorHandle;
+  const authorName = stringOrNull(authorRecord.name) ?? authorHandle;
+  const authorAvatarUrl = stringOrNull(authorRecord.avatarUrl) ?? "";
 
-async function fetchRepositoryIssues(
-  repository: RepositoryConfig,
-  issuePage: number,
-  direction: SortDirection,
-): Promise<RepositoryIssuesResponse> {
-  const url =
-    `https://api.github.com/repos/${repository.repository}/issues` +
-    `?state=open&page=${issuePage}&per_page=${GITHUB_ISSUES_PER_PAGE}` +
-    `&sort=created&direction=${direction}`;
+  const communityRecord = asRecord(record.community) ?? {};
+  const communityRepository = stringOrNull(communityRecord.repository) ?? repository;
+  const communityUrl = stringOrNull(communityRecord.url) ?? repositoryUrl;
+  const communityName =
+    stringOrNull(communityRecord.name) ??
+    stringOrNull(communityRecord.id) ??
+    repository.split("/")[0] ??
+    "unknown";
+  const communityId = stringOrNull(communityRecord.id) ?? communityName;
+  const communityAvatarUrl = stringOrNull(communityRecord.avatarUrl) ?? "";
 
-  const response = await fetch(url, {
-    headers: getGitHubHeaders(),
-    cache: "no-store",
-  });
+  const tags = Array.isArray(record.tags)
+    ? Array.from(
+        new Set(
+          record.tags.filter(
+            (tag): tag is string =>
+              typeof tag === "string" && tag.trim().length > 0,
+          ),
+        ),
+      ).slice(0, 12)
+    : [];
 
-  if (response.status === 404 || response.status === 451) {
-    return {
-      issues: [],
-      rateLimited: false,
-      retryAfterSeconds: null,
-    };
-  }
-
-  if (response.status === 403 && response.headers.get("x-ratelimit-remaining") === "0") {
-    return {
-      issues: [],
-      rateLimited: true,
-      retryAfterSeconds: parseRetryAfterSeconds(response),
-    };
-  }
-
-  if (!response.ok) {
-    return {
-      issues: [],
-      rateLimited: false,
-      retryAfterSeconds: null,
-    };
-  }
-
-  const payload = (await response.json()) as GitHubIssue[];
-
-  if (!Array.isArray(payload)) {
-    return {
-      issues: [],
-      rateLimited: false,
-      retryAfterSeconds: null,
-    };
-  }
+  const issueState = record.issueState === "closed" ? "closed" : "open";
+  const excerpt = stringOrNull(record.excerpt) ?? title;
+  const companyName = stringOrNull(record.companyName) ?? undefined;
+  const salary = normalizeSalary(record.salary);
 
   return {
-    issues: payload.filter((issue) => !issue.pull_request),
+    id,
+    title,
+    excerpt,
+    issueState,
+    repository,
+    repositoryUrl,
+    region,
+    country,
+    tags,
+    author: {
+      id: authorId,
+      name: authorName,
+      handle: authorHandle,
+      avatarUrl: authorAvatarUrl,
+    },
+    community: {
+      id: communityId,
+      name: communityName,
+      avatarUrl: communityAvatarUrl,
+      repository: communityRepository,
+      url: communityUrl,
+    },
+    ...(companyName ? { companyName } : {}),
+    ...(salary ? { salary } : {}),
+    createdAt,
+    updatedAt,
+    url,
+    sourceType: normalizeSourceType(record.sourceType),
+  };
+}
+
+function normalizeSnapshotItems(payload: unknown) {
+  if (Array.isArray(payload)) {
+    return payload
+      .map((item) => normalizeOpportunity(item))
+      .filter((item): item is OpportunityItem => item !== null);
+  }
+
+  const record = asRecord(payload);
+
+  if (!record || !Array.isArray(record.items)) {
+    return null;
+  }
+
+  return record.items
+    .map((item) => normalizeOpportunity(item))
+    .filter((item): item is OpportunityItem => item !== null);
+}
+
+function filterItems(items: OpportunityItem[], searchParams: URLSearchParams) {
+  const repositoryFilter = searchParams.get("repository");
+  const regionFilter = searchParams.get("region");
+  const countryFilter = searchParams.get("country");
+
+  return items.filter((item) => {
+    const matchesRepository =
+      !repositoryFilter || item.repository === repositoryFilter;
+    const matchesRegion = !regionFilter || item.region === regionFilter;
+    const matchesCountry = !countryFilter || item.country === countryFilter;
+
+    return matchesRepository && matchesRegion && matchesCountry;
+  });
+}
+
+function sortItems(items: OpportunityItem[], sortOrder: SortOrder) {
+  return [...items].sort((left, right) => {
+    const leftDate = new Date(left.createdAt).getTime();
+    const rightDate = new Date(right.createdAt).getTime();
+
+    return sortOrder === "oldest" ? leftDate - rightDate : rightDate - leftDate;
+  });
+}
+
+function paginateItems(
+  items: OpportunityItem[],
+  cursor: CursorState,
+  limit: number,
+): OpportunitiesApiPayload {
+  const start = clamp(cursor.offset, 0, items.length);
+  const slicedItems = items.slice(start, start + limit);
+  const nextOffset = start + slicedItems.length;
+  const hasMore = nextOffset < items.length;
+
+  return {
+    items: slicedItems,
+    nextCursor: hasMore ? encodeCursor({ offset: nextOffset }) : null,
+    hasMore,
     rateLimited: false,
     retryAfterSeconds: null,
   };
 }
 
-function filterRepositories(searchParams: URLSearchParams) {
-  const repositoryFilter = searchParams.get("repository");
-  const regionFilter = searchParams.get("region");
-  const countryFilter = searchParams.get("country");
-
-  return REPOSITORIES.filter((repository) => {
-    const matchesRepository =
-      !repositoryFilter || repository.repository === repositoryFilter;
-    const matchesRegion = !regionFilter || repository.region === regionFilter;
-    const matchesCountry = !countryFilter || repository.country === countryFilter;
-
-    return matchesRepository && matchesRegion && matchesCountry;
-  });
+function resolveSnapshotUrl() {
+  return (
+    process.env.OPENINGS_DATA_SNAPSHOT_URL ||
+    process.env.NEXT_PUBLIC_OPENINGS_DATA_SNAPSHOT_URL ||
+    DEFAULT_SNAPSHOT_URL
+  );
 }
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const limit = parseLimit(searchParams.get("limit"));
-    const direction = normalizeSortDirection(searchParams.get("sort"));
-    const repositories = filterRepositories(searchParams);
-
-    if (repositories.length === 0) {
-      return NextResponse.json({
-        items: [],
-        nextCursor: null,
-        hasMore: false,
-        rateLimited: false,
-        retryAfterSeconds: null,
-      });
-    }
-
+    const sortOrder = normalizeSortOrder(searchParams.get("sort"));
     const cursor = decodeCursor(searchParams.get("cursor"));
-    const singleRepositoryMode = repositories.length === 1;
+    const snapshotUrl = resolveSnapshotUrl();
 
-    let repoIndex = clamp(cursor.repoIndex, 0, repositories.length);
-    let issuePage = Math.max(cursor.issuePage, 1);
+    const response = await fetch(snapshotUrl, {
+      headers: { Accept: "application/json" },
+      next: { revalidate: SNAPSHOT_REVALIDATE_SECONDS },
+    });
 
-    const items: OpportunityItem[] = [];
-
-    while (items.length < limit && repoIndex < repositories.length) {
-      const repository = repositories[repoIndex];
-      const repositoryIssues = await fetchRepositoryIssues(
-        repository,
-        issuePage,
-        direction,
+    if (!response.ok) {
+      throw new Error(
+        `Snapshot source unavailable (${response.status}) at ${snapshotUrl}`,
       );
-
-      if (repositoryIssues.rateLimited) {
-        const nextCursor = encodeCursor({ repoIndex, issuePage });
-        const retryAfterSeconds = repositoryIssues.retryAfterSeconds;
-
-        return NextResponse.json(
-          {
-            items,
-            nextCursor,
-            hasMore: true,
-            rateLimited: true,
-            retryAfterSeconds,
-          },
-          {
-            status: 429,
-            headers: retryAfterSeconds
-              ? {
-                  "Retry-After": String(retryAfterSeconds),
-                }
-              : undefined,
-          },
-        );
-      }
-
-      const issues = repositoryIssues.issues;
-      const normalizedIssues = issues.map((issue) =>
-        mapIssueToOpportunity(issue, repository),
-      );
-
-      if (singleRepositoryMode) {
-        const remaining = limit - items.length;
-        items.push(...normalizedIssues.slice(0, remaining));
-
-        if (issues.length === GITHUB_ISSUES_PER_PAGE) {
-          issuePage += 1;
-
-          if (items.length >= limit) {
-            break;
-          }
-
-          continue;
-        }
-
-        repoIndex += 1;
-        issuePage = 1;
-        continue;
-      }
-
-      const remaining = limit - items.length;
-      const takeCount = Math.min(remaining, MULTI_REPOSITORY_TAKE);
-      items.push(...normalizedIssues.slice(0, takeCount));
-
-      repoIndex += 1;
-      issuePage = 1;
     }
 
-    const hasMore = singleRepositoryMode
-      ? repoIndex < repositories.length || issuePage > 1
-      : repoIndex < repositories.length;
+    const payload = await response.json().catch(() => null);
+    const snapshotItems = normalizeSnapshotItems(payload);
 
-    const nextCursor = hasMore ? encodeCursor({ repoIndex, issuePage }) : null;
+    if (!snapshotItems) {
+      throw new Error(`Invalid snapshot payload at ${snapshotUrl}`);
+    }
 
-    return NextResponse.json({
-      items,
-      nextCursor,
-      hasMore,
-      rateLimited: false,
-      retryAfterSeconds: null,
-    });
+    const filteredItems = filterItems(snapshotItems, searchParams);
+    const sortedItems = sortItems(filteredItems, sortOrder);
+    const responsePayload = paginateItems(sortedItems, cursor, limit);
+
+    return NextResponse.json(responsePayload);
   } catch (error) {
     console.error(error);
 
@@ -553,8 +335,8 @@ export async function GET(request: NextRequest) {
         hasMore: false,
         rateLimited: false,
         retryAfterSeconds: null,
-      },
-      { status: 500 },
+      } satisfies OpportunitiesApiPayload,
+      { status: 502 },
     );
   }
 }

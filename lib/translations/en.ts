@@ -9,6 +9,11 @@ export const enTranslations: TranslationMessages = {
   header: {
     brandName: "openings.dev",
     brandTagline: "Tech jobs from GitHub communities",
+    nav: {
+      discover: "Discover",
+      communities: "Communities",
+      users: "Users",
+    },
     languagePlaceholder: "Language",
     languageAriaLabel: "Select language",
     languageChanged: "Language set to {language}.",
@@ -28,10 +33,10 @@ export const enTranslations: TranslationMessages = {
     },
     feedback: {
       filtersReset: "Filters reset",
-      loadError: "Could not load live opportunities from GitHub.",
-      loadMoreError: "Could not load more opportunities from GitHub.",
+      loadError: "Could not load opportunities from the data source.",
+      loadMoreError: "Could not load more opportunities from the data source.",
       rateLimited:
-        "GitHub API rate limit reached. Please wait a few minutes and try again.",
+        "Data source temporarily unavailable. Please wait a few minutes and try again.",
     },
     range: {
       zeroResults: "0 results",
@@ -121,6 +126,8 @@ export const enTranslations: TranslationMessages = {
     },
     links: {
       overview: "Overview",
+      communities: "Communities",
+      users: "Users",
       apiReference: "API Reference",
       status: "Status",
       github: "GitHub",

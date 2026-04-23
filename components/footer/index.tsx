@@ -29,8 +29,8 @@ export function Footer({
   supportText,
   copyrightText,
   signature,
-  lightLogoSrc = "/brand-mark-light.svg",
-  darkLogoSrc = "/brand-mark-dark.svg",
+  lightLogoSrc = "/light-mode-favicon.svg",
+  darkLogoSrc = "/dark-mode-favicon.svg",
   linkGroups,
   socialLinks,
 }: FooterProps) {
@@ -44,6 +44,8 @@ export function Footer({
       title: footerMessages.groups.project,
       links: [
         { label: footerMessages.links.overview, href: "/overview" },
+        { label: footerMessages.links.communities, href: "/community" },
+        { label: footerMessages.links.users, href: "/users" },
         { label: footerMessages.links.apiReference, href: "/docs/api" },
         {
           label: footerMessages.links.status,

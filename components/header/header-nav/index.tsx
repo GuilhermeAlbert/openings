@@ -1,0 +1,44 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils/tailwind";
+import { headerNavLinkStyles, headerNavStyles } from "./styles";
+
+export interface HeaderNavItem {
+  label: string;
+  href: string;
+}
+
+interface HeaderNavProps {
+  className?: string;
+  items: HeaderNavItem[];
+}
+
+function isActivePath(pathname: string, href: string) {
+  if (href === "/") {
+    return pathname === href;
+  }
+
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+export function HeaderNav({ className, items }: HeaderNavProps) {
+  const pathname = usePathname();
+
+  return (
+    <nav className={cn(headerNavStyles(), className)} aria-label="Primary">
+      {items.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={headerNavLinkStyles({
+            active: isActivePath(pathname, item.href),
+          })}
+        >
+          {item.label}
+        </Link>
+      ))}
+    </nav>
+  );
+}

@@ -136,3 +136,8 @@ export interface ViewModeToggleProps {
   value: OpportunityViewMode;
   onChange: (mode: OpportunityViewMode) => void;
 }
+
+export interface OpportunitiesScreenProps {
+  forcedRepository?: string;
+  forcedAuthor?: string;
+}

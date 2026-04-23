@@ -11,6 +11,11 @@ export interface TranslationMessages {
   header: {
     brandName: string;
     brandTagline: string;
+    nav: {
+      discover: string;
+      communities: string;
+      users: string;
+    };
     languagePlaceholder: string;
     languageAriaLabel: string;
     languageChanged: string;
@@ -117,6 +122,8 @@ export interface TranslationMessages {
     };
     links: {
       overview: string;
+      communities: string;
+      users: string;
       apiReference: string;
       status: string;
       github: string;

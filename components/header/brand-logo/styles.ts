@@ -5,7 +5,7 @@ export const brandLogoRootStyles = cva(
 );
 
 export const brandLogoMarkStyles = cva(
-  "relative size-9 overflow-hidden rounded-[10px] border border-border/70 bg-card shadow-[0_1px_2px_rgb(0_0_0/0.06)]",
+  "relative size-8 overflow-hidden rounded-[10px] border border-border/70 bg-card shadow-[0_1px_2px_rgb(0_0_0/0.06)]",
 );
 
 export const brandLogoTextStyles = cva("hidden sm:block");

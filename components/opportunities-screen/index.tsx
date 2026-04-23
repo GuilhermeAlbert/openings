@@ -7,6 +7,11 @@ import { toast } from "sonner";
 import { useI18n } from "@/components/providers/i18n-provider";
 import { REPOSITORIES } from "@/lib/constants/repositories";
 import {
+  buildCommunityPath,
+  buildUserPath,
+  normalizeAuthorHandle,
+} from "@/lib/opportunities/routing";
+import {
   opportunitiesDescriptionStyles,
   opportunitiesHeaderStyles,
   opportunitiesKickerStyles,
@@ -19,6 +24,7 @@ import type {
   OpportunityFilterOptions,
   OpportunityFiltersState,
   OpportunityItem,
+  OpportunitiesScreenProps,
   OpportunitySortOrder,
   OpportunityViewMode,
 } from "@/components/opportunities-screen/types";
@@ -324,12 +330,27 @@ function matchesSearch(opportunity: OpportunityItem, searchText: string) {
   return searchableText.includes(query);
 }
 
-export function OpportunitiesScreen() {
+export function OpportunitiesScreen({
+  forcedRepository,
+  forcedAuthor,
+}: OpportunitiesScreenProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { locale, messages } = useI18n();
   const opportunitiesMessages = messages.opportunities;
+  const normalizedForcedRepository = forcedRepository?.trim() || null;
+  const normalizedForcedAuthor = (() => {
+    if (!forcedAuthor) {
+      return null;
+    }
+
+    const normalized = normalizeAuthorHandle(forcedAuthor);
+    return normalized || null;
+  })();
+  const hasForcedScope = Boolean(
+    normalizedForcedRepository || normalizedForcedAuthor,
+  );
 
   const [filters, setFilters] = React.useState<OpportunityFiltersState>(() =>
     {
@@ -337,7 +358,16 @@ export function OpportunitiesScreen() {
         new URLSearchParams(searchParams.toString()),
       );
 
+      if (normalizedForcedRepository) {
+        parsedFilters.repository = normalizedForcedRepository;
+      }
+
+      if (normalizedForcedAuthor) {
+        parsedFilters.authors = [normalizedForcedAuthor];
+      }
+
       if (
+        !hasForcedScope &&
         !searchParams.has("country") &&
         parsedFilters.country === DEFAULT_FILTERS.country
       ) {
@@ -366,16 +396,23 @@ export function OpportunitiesScreen() {
 
   const serverFilters = React.useMemo(
     () => ({
-      repository: KNOWN_REPOSITORIES.has(filters.repository)
-        ? filters.repository
-        : DEFAULT_FILTERS.repository,
+      repository: normalizedForcedRepository ??
+        (KNOWN_REPOSITORIES.has(filters.repository)
+          ? filters.repository
+          : DEFAULT_FILTERS.repository),
       region: KNOWN_REGIONS.has(filters.region) ? filters.region : DEFAULT_FILTERS.region,
       country: KNOWN_COUNTRIES.has(filters.country)
         ? filters.country
         : DEFAULT_FILTERS.country,
       sortOrder: filters.sortOrder,
     }),
-    [filters.country, filters.region, filters.repository, filters.sortOrder],
+    [
+      filters.country,
+      filters.region,
+      filters.repository,
+      filters.sortOrder,
+      normalizedForcedRepository,
+    ],
   );
 
   const fetchOpportunities = React.useCallback(
@@ -526,17 +563,20 @@ export function OpportunitiesScreen() {
 
     return {
       ...filters,
-      repository: repositoryValues.has(filters.repository)
-        ? filters.repository
-        : DEFAULT_FILTERS.repository,
+      repository: normalizedForcedRepository ??
+        (repositoryValues.has(filters.repository)
+          ? filters.repository
+          : DEFAULT_FILTERS.repository),
       region: regionValues.has(filters.region) ? filters.region : DEFAULT_FILTERS.region,
       country: countryValues.has(filters.country)
         ? filters.country
         : DEFAULT_FILTERS.country,
       tags: filters.tags.filter((tag) => tagValues.has(tag)),
-      authors: filters.authors.filter((author) => authorValues.has(author)),
+      authors: normalizedForcedAuthor
+        ? [normalizedForcedAuthor]
+        : filters.authors.filter((author) => authorValues.has(author)),
     };
-  }, [filters, options]);
+  }, [filters, normalizedForcedAuthor, normalizedForcedRepository, options]);
 
   const filteredOpportunities = React.useMemo(() => {
     const filtered = opportunities.filter((opportunity) => {
@@ -616,16 +656,17 @@ export function OpportunitiesScreen() {
   const activeFiltersCount = React.useMemo(
     () =>
       [
-        normalizedFilters.repository !== DEFAULT_FILTERS.repository,
+        !normalizedForcedRepository &&
+          normalizedFilters.repository !== DEFAULT_FILTERS.repository,
         normalizedFilters.region !== DEFAULT_FILTERS.region,
         normalizedFilters.country !== DEFAULT_FILTERS.country,
         normalizedFilters.tags.length > 0,
-        normalizedFilters.authors.length > 0,
+        !normalizedForcedAuthor && normalizedFilters.authors.length > 0,
         normalizedFilters.searchText.trim().length > 0,
         normalizedFilters.sortOrder !== DEFAULT_FILTERS.sortOrder,
         normalizedFilters.itemsPerPage !== DEFAULT_FILTERS.itemsPerPage,
       ].filter(Boolean).length,
-    [normalizedFilters],
+    [normalizedFilters, normalizedForcedAuthor, normalizedForcedRepository],
   );
 
   const hasActiveFilters = activeFiltersCount > 0;
@@ -683,6 +724,14 @@ export function OpportunitiesScreen() {
   const handleFieldChange = React.useCallback<OnFilterFieldChange>(
     (field, value) => {
       setFilters((previous) => {
+        if (field === "repository" && normalizedForcedRepository) {
+          return previous;
+        }
+
+        if (field === "authors" && normalizedForcedAuthor) {
+          return previous;
+        }
+
         const next = { ...previous, [field]: value } as OpportunityFiltersState;
 
         if (field !== "page" && field !== "viewMode") {
@@ -692,7 +741,7 @@ export function OpportunitiesScreen() {
         return next;
       });
     },
-    [],
+    [normalizedForcedAuthor, normalizedForcedRepository],
   );
 
   const handleToggleTag = React.useCallback((tag: string) => {
@@ -710,6 +759,10 @@ export function OpportunitiesScreen() {
   }, []);
 
   const handleToggleAuthor = React.useCallback((authorHandle: string) => {
+    if (normalizedForcedAuthor) {
+      return;
+    }
+
     setFilters((previous) => {
       const isSelected = previous.authors.includes(authorHandle);
 
@@ -721,15 +774,21 @@ export function OpportunitiesScreen() {
         page: 1,
       };
     });
-  }, []);
+  }, [normalizedForcedAuthor]);
 
   const handleClearFilters = React.useCallback(() => {
     setFilters((previous) => ({
       ...DEFAULT_FILTERS,
+      repository: normalizedForcedRepository ?? DEFAULT_FILTERS.repository,
+      authors: normalizedForcedAuthor ? [normalizedForcedAuthor] : [],
       viewMode: previous.viewMode,
     }));
     toast.success(opportunitiesMessages.feedback.filtersReset);
-  }, [opportunitiesMessages.feedback.filtersReset]);
+  }, [
+    normalizedForcedAuthor,
+    normalizedForcedRepository,
+    opportunitiesMessages.feedback.filtersReset,
+  ]);
 
   const hasMore = currentPage < totalPages || hasMoreRemote;
 
@@ -776,21 +835,49 @@ export function OpportunitiesScreen() {
     totalPages,
   ]);
 
-  const handleCommunitySelect = React.useCallback((repository: string) => {
-    setFilters((previous) => ({
-      ...previous,
-      repository,
-      page: 1,
-    }));
-  }, []);
+  const handleCommunitySelect = React.useCallback(
+    (repository: string) => {
+      router.push(buildCommunityPath(repository));
+    },
+    [router],
+  );
 
-  const handleAuthorSelect = React.useCallback((authorHandle: string) => {
-    setFilters((previous) => ({
-      ...previous,
-      authors: [authorHandle],
-      page: 1,
-    }));
-  }, []);
+  const handleAuthorSelect = React.useCallback(
+    (authorHandle: string) => {
+      router.push(buildUserPath(authorHandle));
+    },
+    [router],
+  );
+
+  React.useEffect(() => {
+    if (!normalizedForcedAuthor) {
+      return;
+    }
+
+    if (isLoading || isFetchingMore) {
+      return;
+    }
+
+    if (filteredOpportunities.length > 0) {
+      return;
+    }
+
+    if (!hasMoreRemote || !nextCursor) {
+      return;
+    }
+
+    queueMicrotask(() => {
+      void handleLoadMore();
+    });
+  }, [
+    filteredOpportunities.length,
+    handleLoadMore,
+    hasMoreRemote,
+    isFetchingMore,
+    isLoading,
+    nextCursor,
+    normalizedForcedAuthor,
+  ]);
 
   return (
     <section className={opportunitiesScreenStyles()}>
