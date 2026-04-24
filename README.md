@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://openings.dev">
-    <img src="public/logo.png" alt="openings.dev" width="190" />
+    <img src="public/logo-dark.png" alt="openings.dev" width="190" />
   </a>
 </p>
 
