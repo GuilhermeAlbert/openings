@@ -14,7 +14,7 @@ import {
   compactSelectTriggerStyles,
   controlBarStyles,
 } from "@/app/opportunities/_components/opportunities-screen/styles";
-import { formatTemplate } from "@/app/opportunities/_components/opportunities-screen/shared/format-template";
+import { formatTemplate } from "@/lib/utils/format-template";
 import type {
   OpportunitiesToolbarProps,
   OpportunitySortOrder,

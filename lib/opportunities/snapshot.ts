@@ -1,5 +1,5 @@
-const DEFAULT_SNAPSHOT_URL =
-  "https://raw.githubusercontent.com/openings-dev/data/main/snapshots/opportunities/index.json";
+import { openingsDataUrl } from "./static-api";
+
 const SNAPSHOT_FETCH_BATCH_SIZE = 12;
 
 type UnknownRecord = Record<string, unknown>;
@@ -30,7 +30,7 @@ function resolveSnapshotUrl() {
   return (
     process.env.OPENINGS_DATA_SNAPSHOT_URL ||
     process.env.NEXT_PUBLIC_OPENINGS_DATA_SNAPSHOT_URL ||
-    DEFAULT_SNAPSHOT_URL
+    openingsDataUrl("index.json")
   );
 }
 
@@ -42,26 +42,6 @@ async function fetchJson(url: string) {
   }
 
   return response.json().catch(() => null);
-}
-
-function normalizeLegacySnapshotPayload(payload: unknown): SnapshotDataset | null {
-  if (Array.isArray(payload)) {
-    return {
-      items: sortAndDedupeSnapshotItems(payload),
-      generatedAt: null,
-    };
-  }
-
-  const record = asRecord(payload);
-
-  if (!record || !Array.isArray(record.items)) {
-    return null;
-  }
-
-  return {
-    items: sortAndDedupeSnapshotItems(record.items),
-    generatedAt: stringOrNull(record.generatedAt),
-  };
 }
 
 function sortAndDedupeSnapshotItems(items: unknown[]) {
@@ -138,16 +118,11 @@ async function loadSegmentedSnapshotItems(
 async function loadSnapshotDatasetUncached(): Promise<SnapshotDataset> {
   const snapshotUrl = resolveSnapshotUrl();
   const payload = await fetchJson(snapshotUrl);
-  const legacyPayload = normalizeLegacySnapshotPayload(payload);
-
-  if (legacyPayload) {
-    return legacyPayload;
-  }
 
   return loadSegmentedSnapshotItems(snapshotUrl, payload);
 }
 
-export function loadSnapshotDataset() {
+function loadSnapshotDataset() {
   if (!snapshotDatasetPromise) {
     snapshotDatasetPromise = loadSnapshotDatasetUncached();
   }

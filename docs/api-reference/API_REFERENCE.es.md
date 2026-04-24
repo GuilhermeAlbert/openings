@@ -1,22 +1,49 @@
 # Referencia de API
 
-Este documento describe la dirección de la API pública de openings.dev.
+El front-end de openings.dev consume una API JSON estática publicada por el repositorio `openings-dev/data` mediante URLs raw de GitHub.
 
-La API expone el mismo índice normalizado de vacantes usado por la aplicación web, para facilitar integraciones, automatizaciones y análisis en productos de terceros.
+No existe un endpoint local `/api/opportunities` en el front-end. Los consumidores deben leer los archivos estáticos remotos directamente.
 
-## Estado
+## URLs base
 
-La API es pública y evoluciona continuamente. Algunos contratos pueden cambiar mientras maduran filtros y reglas de normalización.
+```txt
+https://raw.githubusercontent.com/openings-dev/data/main/snapshots/opportunities
+https://raw.githubusercontent.com/openings-dev/data/main
+```
 
-## Objetivos de diseño
+Usa la primera URL para oportunidades y archivos de la API estática. Usa la segunda para el catálogo de repositorios.
 
-- Esquema consistente entre repositorios de origen.
-- Paginación predecible para sincronización incremental.
-- Identificadores estables para deduplicación.
-- Campos claros para stack, seniority, remoto y ubicación.
+## Archivos principales
+
+- `api/manifest.json`
+- `api/order/recent.json`
+- `api/page-lookup.json`
+- `api/pages/page-0001.json`
+- `api/jobs/<bucket>.json`
+- `api/job-ids.json`
+- `api/facet-index.json`
+- `api/search-index.json`
+- `index.json`
+- `countries/<country-code>/index.json`
+
+## Ejemplo
+
+```ts
+const baseUrl =
+  "https://raw.githubusercontent.com/openings-dev/data/main/snapshots/opportunities";
+
+const manifest = await fetch(`${baseUrl}/api/manifest.json`).then((response) =>
+  response.json(),
+);
+```
+
+## Notas
+
+- Los datos provienen de fuentes publicas de GitHub.
+- El front-end no usa JSON local, mocks ni fallback local de datos.
+- `generatedAt` indica la frescura del snapshot.
+- Cada oportunidad debe enlazar a la issue original para verificacion final.
 
 ## Soporte
-
-Para dudas o sugerencias de integración:
 
 - [GitHub Issues](https://github.com/openings-dev/openings/issues)

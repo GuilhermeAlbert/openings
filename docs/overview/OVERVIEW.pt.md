@@ -1,16 +1,26 @@
 # Visão geral do openings.dev
 
-O openings.dev é um agregador global de vagas de tecnologia alimentado por issues do GitHub.
+O openings.dev é uma aplicação estática para descobrir vagas de tecnologia publicadas em repositórios públicos de comunidades no GitHub.
 
-Em vez de depender apenas de job boards tradicionais, a plataforma acompanha repositórios de comunidades onde vagas são publicadas como issues. Cada issue é coletada, normalizada, enriquecida e indexada para que a busca aconteça em um só lugar.
+O front-end é um projeto Next.js App Router exportado como páginas estáticas. Ele não armazena dados de vagas localmente. A aplicação consome arquivos JSON remotos publicados pelo repositório `openings-dev/data`.
 
 ## O que a plataforma faz
 
-- Monitora repositórios de vagas em diferentes países e comunidades.
-- Normaliza o conteúdo bruto em um schema único de vagas.
-- Enriquece os registros com stack, senioridade, local e formato remoto.
-- Usa o mesmo índice para web e API pública.
+- Lista vagas abertas de repositórios GitHub curados.
+- Permite filtros por repositório, região, país, tags, autores e ordenação.
+- Gera páginas estáticas de comunidades, usuários e detalhes de vaga a partir do dataset remoto.
+- Mantém links para a issue e o repositório original.
 
-## Por que isso importa
+## Fluxo de dados
 
-Muitas boas vagas ficam restritas a comunidades específicas e não entram nos grandes portais. O openings.dev reduz esse atrito sem perder o contexto original da publicação.
+1. O pipeline `openings-dev/data` lê repositórios públicos configurados.
+2. O pipeline normaliza issues, gera facets, páginas e snapshots segmentados.
+3. O front-end lê esses arquivos via `raw.githubusercontent.com`.
+4. A UI resolve listas, filtros e detalhes usando a API estática remota.
+
+## Limites atuais
+
+- Front-end: `openings-dev/openings`.
+- Pipeline e API estática raw: `openings-dev/data`.
+- Dados locais de vagas no front-end: nenhum.
+- Endpoint local de oportunidades: nenhum.

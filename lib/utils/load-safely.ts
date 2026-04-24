@@ -1,18 +1,15 @@
 interface LoadSafelyParams<TData> {
   load: () => Promise<TData>;
-  fallback: TData;
-  errorMessage: string;
+  defaultValue: TData;
 }
 
 export async function loadSafely<TData>({
   load,
-  fallback,
-  errorMessage,
+  defaultValue,
 }: LoadSafelyParams<TData>) {
   try {
     return await load();
-  } catch (error) {
-    console.error(errorMessage, error);
-    return fallback;
+  } catch {
+    return defaultValue;
   }
 }

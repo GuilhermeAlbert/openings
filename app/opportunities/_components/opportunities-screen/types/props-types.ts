@@ -4,7 +4,7 @@ import type {
   OpportunitySortOrder,
   UserProfileSummary,
   OpportunityViewMode,
-} from "./domain-types";
+} from "@/lib/opportunities/types";
 import type {
   OnFilterFieldChange,
   OpportunityFilterOptions,

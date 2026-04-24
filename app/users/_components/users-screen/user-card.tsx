@@ -3,7 +3,7 @@
 import { MapPin, Rows3, User } from "lucide-react";
 import { DirectoryEntityCard } from "@/app/_components/directory";
 import { buildUserPath } from "@/lib/opportunities/routing";
-import { formatTemplate } from "@/app/opportunities/_components/opportunities-screen/shared/format-template";
+import { formatTemplate } from "@/lib/utils/format-template";
 import type { UserSummary } from "@/lib/opportunities/users";
 
 interface UserCardProps {

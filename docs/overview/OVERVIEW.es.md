@@ -1,16 +1,26 @@
-# Resumen de openings.dev
+# Vision general de openings.dev
 
-openings.dev es un agregador global de empleos tech impulsado por issues de GitHub.
+openings.dev es una aplicacion estatica para descubrir oportunidades de tecnologia publicadas en repositorios publicos de comunidades en GitHub.
 
-En lugar de depender solo de portales tradicionales, la plataforma sigue repositorios de comunidades donde las vacantes se publican como issues. Cada issue se ingiere, normaliza, enriquece e indexa para centralizar la búsqueda.
+El front-end es un proyecto Next.js App Router exportado como paginas estaticas. No almacena datos de oportunidades localmente. La aplicacion consume archivos JSON remotos publicados por el repositorio `openings-dev/data`.
 
-## Qué hace la plataforma
+## Que hace la plataforma
 
-- Monitorea repositorios comunitarios de empleo en distintas regiones.
-- Normaliza contenido en un esquema único de vacantes.
-- Enriquece registros con stack, seniority, ubicación y modalidad remota.
-- Usa el mismo índice para la web y la API pública.
+- Lista oportunidades abiertas de repositorios GitHub curados.
+- Permite filtros por repositorio, region, pais, tags, autores y orden.
+- Genera paginas estaticas de comunidades, usuarios y detalles de oportunidad desde el dataset remoto.
+- Mantiene enlaces a la issue y al repositorio original.
 
-## Por qué importa
+## Flujo de datos
 
-Muchas vacantes de calidad quedan dentro de comunidades y no llegan a los job boards masivos. openings.dev reduce esa fricción sin perder el contexto original de publicación.
+1. El pipeline `openings-dev/data` lee repositorios publicos configurados.
+2. El pipeline normaliza issues, genera facets, paginas y snapshots segmentados.
+3. El front-end lee esos archivos via `raw.githubusercontent.com`.
+4. La UI resuelve listas, filtros y detalles usando la API estatica remota.
+
+## Limites actuales
+
+- Front-end: `openings-dev/openings`.
+- Pipeline y API estatica raw: `openings-dev/data`.
+- Datos locales de oportunidades en el front-end: ninguno.
+- Endpoint local de oportunidades: ninguno.

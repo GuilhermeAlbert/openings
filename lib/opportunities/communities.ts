@@ -1,4 +1,5 @@
 import { loadSnapshotItems } from "./snapshot";
+import { dateToMs } from "./summary-helpers";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -23,11 +24,6 @@ function asRecord(value: unknown): UnknownRecord | null {
 
 function stringOrNull(value: unknown) {
   return typeof value === "string" && value.trim().length > 0 ? value : null;
-}
-
-function dateToMs(value: unknown) {
-  const parsed = Date.parse(typeof value === "string" ? value : "");
-  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function repositoryLabel(repository: string) {

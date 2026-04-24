@@ -14,7 +14,7 @@ import { useForcedAuthorAutoload } from "./use-forced-author-autoload";
 import { useLoadMoreHandler } from "./use-load-more-handler";
 import { useRemoteOpportunities } from "./use-remote-opportunities";
 import { useUrlSync } from "./use-url-sync";
-import { formatTemplate } from "@/app/opportunities/_components/opportunities-screen/shared/format-template";
+import { formatTemplate } from "@/lib/utils/format-template";
 import type {
   CommunityProfileSummary,
   OpportunitiesScreenProps,

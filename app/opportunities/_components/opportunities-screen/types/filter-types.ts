@@ -1,4 +1,8 @@
-import type { OpportunitySortOrder, OpportunityViewMode } from "./domain-types";
+import type {
+  OpportunityFilterFacets,
+  OpportunitySortOrder,
+  OpportunityViewMode,
+} from "@/lib/opportunities/types";
 
 export interface OpportunityFiltersState {
   repository: string;
@@ -17,15 +21,6 @@ export interface FilterOption {
   value: string;
   label: string;
   count: number;
-}
-
-export interface OpportunityFilterFacets {
-  repositories: Record<string, number>;
-  regions: Record<string, number>;
-  countries: Record<string, number>;
-  tags: Record<string, number>;
-  authors: Record<string, number>;
-  authorLabels: Record<string, string>;
 }
 
 export interface OpportunityTagCategoryOptions {
@@ -49,3 +44,5 @@ export type OnFilterFieldChange = <TField extends keyof OpportunityFiltersState>
   field: TField,
   value: OpportunityFiltersState[TField],
 ) => void;
+
+export type { OpportunityFilterFacets };

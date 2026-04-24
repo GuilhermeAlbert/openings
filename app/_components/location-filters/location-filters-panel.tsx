@@ -4,7 +4,7 @@ import * as React from "react";
 import { ChevronDown, RotateCcw, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useResponsiveFilterPanel } from "@/app/_hooks/use-responsive-filter-panel";
-import { formatTemplate } from "@/app/opportunities/_components/opportunities-screen/shared/format-template";
+import { formatTemplate } from "@/lib/utils/format-template";
 import { cn } from "@/lib/utils/tailwind";
 import type {
   LocationFilterOption,

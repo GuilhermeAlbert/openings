@@ -6,7 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { compactSelectTriggerStyles } from "@/app/opportunities/_components/opportunities-screen/styles";
-import { formatTemplate } from "@/app/opportunities/_components/opportunities-screen/shared/format-template";
+import { formatTemplate } from "@/lib/utils/format-template";
 import { FilterSection } from "../filter-section";
 import type { OpportunityFilterOptions, OpportunityFiltersState, OpportunitySortOrder } from "@/app/opportunities/_components/opportunities-screen/types";
 

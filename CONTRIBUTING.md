@@ -1,29 +1,69 @@
 # Contributing to openings.dev
 
-Thanks for helping improve openings.dev.
+Thanks for improving `openings.dev`.
 
-## Ways to contribute
+## Scope
 
-- Add new community repositories that publish jobs via GitHub issues
-- Improve stack/seniority/location detection logic
-- Fix bugs in ingestion, API or UI
-- Improve docs and examples
+This repository contains the static Next.js front-end. It does not store or generate opportunity data.
 
-## Development setup
+Use this repository for:
+
+- UI and UX improvements.
+- Routing, static page, and accessibility fixes.
+- Remote data service improvements under `lib/opportunities`.
+- Documentation updates for the front-end.
+
+Use [`openings-dev/data`](https://github.com/openings-dev/data) for:
+
+- Source repository catalog changes.
+- GitHub ingestion and normalization logic.
+- Snapshot generation and static API files.
+
+## Data Rules
+
+- Do not add local job data, mock datasets, fixtures, `db.json`, or JSON snapshots to the front-end.
+- Do not import local `.json` files for opportunity data.
+- Do not reintroduce a local `/api/opportunities` route.
+- Keep raw data URL construction in `lib/opportunities/static-api.ts`.
+- Keep static API reads in `lib/opportunities/api.ts`.
+- Keep snapshot reads in `lib/opportunities/snapshot.ts`.
+
+## Development Setup
+
+Requirements:
+
+- Node.js `>=20.9.0`
+- npm
 
 ```bash
-git clone https://github.com/openings-dev/openings
-cd openings
 npm install
 npm run dev
 ```
 
 Open `http://localhost:3000`.
 
-## Workflow
+Only create `.env.local` when testing another remote data branch:
 
-1. Create a branch from `main`
-2. Make focused changes
+```bash
+NEXT_PUBLIC_OPENINGS_DATA_BASE_URL=https://raw.githubusercontent.com/openings-dev/data/main/snapshots/opportunities
+NEXT_PUBLIC_OPENINGS_DATA_REPOSITORY_BASE_URL=https://raw.githubusercontent.com/openings-dev/data/main
+```
+
+## Project Structure
+
+```txt
+app/                      App Router routes and route-local UI
+components/               shared shell, providers, icons, and UI primitives
+lib/opportunities/        remote data services, routing helpers, and domain types
+lib/translations/         localized UI messages
+lib/utils/                shared utilities
+docs/                     localized markdown rendered by the app
+```
+
+## Pull Request Workflow
+
+1. Create a branch from `main`.
+2. Keep the change focused.
 3. Run checks:
 
 ```bash
@@ -31,29 +71,21 @@ npm run lint
 npm run build
 ```
 
-4. Open a Pull Request with:
+4. Open a pull request with:
 
-- clear summary
-- screenshots for UI changes
-- test notes (what you ran)
+- Clear summary.
+- Screenshots for visual changes.
+- Test notes listing the commands you ran.
+- Any data source override used during testing.
 
-## Adding a source repository
+## Pull Request Checklist
 
-When proposing a new source repo, include:
+- [ ] No local data files or JSON imports were added.
+- [ ] Remote data access remains centralized in `lib/opportunities`.
+- [ ] Components stay focused and reusable.
+- [ ] Documentation changed when behavior or setup changed.
+- [ ] `npm run lint` and `npm run build` pass locally.
 
-- repository URL
-- country/region covered
-- language
-- proof that jobs are published as issues
-- expected posting frequency (if known)
+## Code of Conduct
 
-## Pull request checklist
-
-- [ ] Change is scoped and documented
-- [ ] Lint/build pass locally
-- [ ] No unrelated refactors in the same PR
-- [ ] Breaking changes are explicitly called out
-
-## Code of conduct
-
-By participating, you agree to follow our [Code of Conduct](./CODE_OF_CONDUCT.md).
+By participating, you agree to follow the [Code of Conduct](./CODE_OF_CONDUCT.md).

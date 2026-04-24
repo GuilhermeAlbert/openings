@@ -4,7 +4,7 @@ import * as React from "react";
 import { Activity, Clock3 } from "lucide-react";
 import { useI18n } from "@/components/providers/i18n-provider";
 import { opportunitiesSnapshotStatusStyles } from "@/app/opportunities/_components/opportunities-screen/styles";
-import { formatTemplate } from "@/app/opportunities/_components/opportunities-screen/shared/format-template";
+import { formatTemplate } from "@/lib/utils/format-template";
 
 interface SnapshotStatusProps {
   totalCount: number;

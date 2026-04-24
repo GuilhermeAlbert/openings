@@ -24,8 +24,7 @@ export async function generateStaticParams() {
           .filter(Boolean),
       }))
       .filter((entry) => entry.repository.length > 0);
-  } catch (error) {
-    console.error("Failed to generate static params for /community", error);
+  } catch {
     return [];
   }
 }

@@ -13,8 +13,7 @@ export async function generateStaticParams() {
     return ids.length > 0
       ? ids.map((id) => ({ id }))
       : [{ id: "__placeholder__" }];
-  } catch (error) {
-    console.error("Failed to generate static params for /jobs", error);
+  } catch {
     return [{ id: "__placeholder__" }];
   }
 }

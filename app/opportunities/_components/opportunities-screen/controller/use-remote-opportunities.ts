@@ -1,6 +1,9 @@
 import * as React from "react";
 import { toast } from "sonner";
-import { fetchOpportunitiesPage } from "./api";
+import {
+  fetchOpportunitiesPage,
+  type OpportunityServerFilters,
+} from "@/lib/opportunities/api";
 import { dedupeOpportunities, matchesSearch } from "./filtering";
 import { INITIAL_BATCH_SIZE, LOAD_MORE_BATCH_SIZE } from "./defaults";
 import { canonicalTagValue } from "./tag-normalization";
@@ -8,7 +11,6 @@ import type {
   OpportunityFilterFacets,
   OpportunityItem,
 } from "@/app/opportunities/_components/opportunities-screen/types";
-import type { OpportunityServerFilters } from "./server-filters";
 
 interface UseRemoteOpportunitiesParams {
   serverFilters: OpportunityServerFilters;
@@ -136,9 +138,8 @@ export function useRemoteOpportunities({
         setHasMoreRemote(payload.rateLimited ? false : payload.hasMore);
         if (payload.rateLimited) toast.error(messages.rateLimited);
       })
-      .catch((error) => {
+      .catch(() => {
         if (controller.signal.aborted) return;
-        console.error(error);
         setHasMoreRemote(false);
         toast.error(messages.loadError);
       })
@@ -199,8 +200,7 @@ export function useRemoteOpportunities({
       if (!canContinue) exhaustedCursorsRef.current.add(requestedCursor);
       if (payload.rateLimited) toast.error(messages.rateLimited);
       return hasNewItems;
-    } catch (error) {
-      console.error(error);
+    } catch {
       setHasMoreRemote(false);
       exhaustedCursorsRef.current.add(requestedCursor);
       toast.error(messages.loadMoreError);

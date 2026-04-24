@@ -149,11 +149,6 @@ const PROJECT_DOCUMENT_PATH = {
   },
 } satisfies Record<ProjectDocumentKey, Record<LocaleCode, ProjectDocumentPathConfig>>;
 
-export interface ProjectDocumentContent {
-  fileName: string;
-  markdown: string;
-}
-
 export interface ProjectDocumentBundle {
   markdownByLocale: Record<LocaleCode, string>;
   sourceFileByLocale: Record<LocaleCode, string>;

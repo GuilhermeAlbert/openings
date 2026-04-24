@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useI18n } from "@/components/providers/i18n-provider";
 import { formatSalary } from "@/app/opportunities/_components/opportunities-screen/shared/format-salary";
-import { formatTemplate } from "@/app/opportunities/_components/opportunities-screen/shared/format-template";
+import { formatTemplate } from "@/lib/utils/format-template";
 import { panelStyles } from "@/app/opportunities/_components/opportunities-screen/styles";
 import { cn } from "@/lib/utils/tailwind";
 import type { OpportunityDrawerProps } from "@/app/opportunities/_components/opportunities-screen/types";

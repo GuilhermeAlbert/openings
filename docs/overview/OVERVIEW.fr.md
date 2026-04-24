@@ -1,16 +1,26 @@
-# Vue d'ensemble de openings.dev
+# Apercu de openings.dev
 
-openings.dev est un agrégateur global d'offres tech alimenté par des issues GitHub.
+openings.dev est une application statique pour decouvrir des opportunites tech publiees dans des depots publics de communautes GitHub.
 
-Au lieu de dépendre uniquement des job boards traditionnels, la plateforme suit des dépôts communautaires où les offres sont publiées en issues. Chaque issue est ingérée, normalisée, enrichie et indexée pour centraliser la recherche.
+Le front-end est un projet Next.js App Router exporte en pages statiques. Il ne stocke pas de donnees d'opportunites localement. L'application consomme des fichiers JSON distants publies par le depot `openings-dev/data`.
 
 ## Ce que fait la plateforme
 
-- Surveille des dépôts communautaires de recrutement dans plusieurs régions.
-- Normalise le contenu dans un schéma unique d'offres.
-- Enrichit les données avec stack, séniorité, localisation et remote.
-- Alimente l'application web et l'API publique depuis le même index.
+- Liste des opportunites ouvertes depuis des depots GitHub selectionnes.
+- Propose des filtres par depot, region, pays, tags, auteurs et tri.
+- Genere des pages statiques de communautes, utilisateurs et details d'opportunite depuis le dataset distant.
+- Conserve les liens vers l'issue et le depot d'origine.
 
-## Pourquoi c'est utile
+## Flux de donnees
 
-Beaucoup d'offres de qualité restent dans des communautés et n'arrivent pas sur les grandes plateformes. openings.dev réduit cette friction sans perdre le contexte d'origine.
+1. Le pipeline `openings-dev/data` lit les depots publics configures.
+2. Le pipeline normalise les issues, genere les facets, les pages et les snapshots segmentes.
+3. Le front-end lit ces fichiers via `raw.githubusercontent.com`.
+4. L'UI resout les listes, filtres et details avec l'API statique distante.
+
+## Limites actuelles
+
+- Front-end: `openings-dev/openings`.
+- Pipeline et API statique raw: `openings-dev/data`.
+- Donnees locales d'opportunites dans le front-end: aucune.
+- Endpoint local d'opportunites: aucun.

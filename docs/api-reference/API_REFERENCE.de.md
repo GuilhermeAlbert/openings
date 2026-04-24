@@ -1,22 +1,49 @@
 # API-Referenz
 
-Dieses Dokument beschreibt die Ausrichtung der oeffentlichen API von openings.dev.
+Das openings.dev-Front-end verwendet eine statische JSON-API, die vom Repository `openings-dev/data` uber GitHub-Raw-URLs veroffentlicht wird.
 
-Die API stellt denselben normalisierten Stellenindex bereit wie die Web-App, um Integrationen, Automatisierungen und Analysen in Drittprodukten zu ermoeglichen.
+Es gibt im Front-end keinen lokalen Endpunkt `/api/opportunities`. Verbraucher sollen die entfernten statischen Dateien direkt lesen.
 
-## Status
+## Basis-URLs
 
-Die API ist oeffentlich und entwickelt sich weiter. Vertragsdetails koennen sich aendern, waehrend Filter und Normalisierungsregeln reifen.
+```txt
+https://raw.githubusercontent.com/openings-dev/data/main/snapshots/opportunities
+https://raw.githubusercontent.com/openings-dev/data/main
+```
 
-## Designziele
+Die erste URL gilt fur Opportunities und statische API-Dateien. Die zweite URL gilt fur den Repository-Katalog.
 
-- Konsistentes Schema ueber alle Quell-Repositories.
-- Vorhersehbare Pagination fuer inkrementelle Synchronisierung.
-- Stabile IDs fuer Deduplizierung.
-- Klare Felder fuer Stack, Senioritaet, Remote und Standort.
+## Wichtige Dateien
+
+- `api/manifest.json`
+- `api/order/recent.json`
+- `api/page-lookup.json`
+- `api/pages/page-0001.json`
+- `api/jobs/<bucket>.json`
+- `api/job-ids.json`
+- `api/facet-index.json`
+- `api/search-index.json`
+- `index.json`
+- `countries/<country-code>/index.json`
+
+## Beispiel
+
+```ts
+const baseUrl =
+  "https://raw.githubusercontent.com/openings-dev/data/main/snapshots/opportunities";
+
+const manifest = await fetch(`${baseUrl}/api/manifest.json`).then((response) =>
+  response.json(),
+);
+```
+
+## Hinweise
+
+- Die Daten stammen aus offentlichen GitHub-Quellen.
+- Das Front-end nutzt keine lokalen JSON-Dateien, Mocks oder lokalen Daten-Fallbacks.
+- `generatedAt` zeigt die Aktualitat des Snapshots.
+- Jede Opportunity sollte zur finalen Prufung auf die ursprungliche Issue verweisen.
 
 ## Support
-
-Bei Fragen oder Integrationsfeedback:
 
 - [GitHub Issues](https://github.com/openings-dev/openings/issues)

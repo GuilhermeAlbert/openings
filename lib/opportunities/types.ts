@@ -49,6 +49,15 @@ export interface OpportunityItem {
   sourceType: OpportunitySourceType;
 }
 
+export interface OpportunityFilterFacets {
+  repositories: Record<string, number>;
+  regions: Record<string, number>;
+  countries: Record<string, number>;
+  tags: Record<string, number>;
+  authors: Record<string, number>;
+  authorLabels: Record<string, string>;
+}
+
 export interface UserProfileSummary {
   handle: string;
   name: string;

@@ -1,22 +1,31 @@
-# Contribuir
+# Contribucion
 
-Gracias por contribuir a openings.dev.
+Este repositorio contiene solo el front-end estatico de openings.dev.
 
-## Cómo contribuir
+Usa este proyecto para cambios de UI, rutas, accesibilidad, servicios remotos en `lib/opportunities` y documentacion del front-end. Cambios en el catalogo de fuentes, pipeline de datos y snapshots pertenecen al repositorio `openings-dev/data`.
 
-- Sugerir nuevos repositorios que publiquen vacantes como issues
-- Reportar errores o inconsistencias de datos
-- Proponer mejoras de UX, búsqueda y documentación
-- Enviar PRs con cambios pequeños, claros y verificables
+## Reglas de datos
 
-## Flujo recomendado
+- No agregues datos locales de oportunidades, mocks, fixtures, `db.json` o snapshots JSON.
+- No importes archivos `.json` locales para oportunidades.
+- No recrees un endpoint local `/api/opportunities`.
+- Mantén URLs raw en `lib/opportunities/static-api.ts`.
+- Mantén lecturas de la API estatica en `lib/opportunities/api.ts`.
 
-1. Abre una issue con el problema o propuesta.
-2. Alinea el enfoque antes de implementar cambios grandes.
-3. Envía un PR con una descripción clara del impacto.
+## Setup
 
-## Guía completa
+```bash
+npm install
+npm run dev
+```
 
-Para reglas detalladas, consulta el archivo principal:
+Usa Node.js `>=20.9.0`.
 
-- [CONTRIBUTING.md](./CONTRIBUTING.md)
+## Validacion
+
+```bash
+npm run lint
+npm run build
+```
+
+Incluye capturas para cambios visuales y lista los comandos ejecutados en el PR.

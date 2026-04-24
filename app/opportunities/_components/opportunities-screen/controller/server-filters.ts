@@ -6,17 +6,7 @@ import { normalizeFilterDependencies } from "./filter-dependencies";
 import type { RepositoryFilterRegistry } from "./repository-filter-registry";
 import { canonicalTagValue } from "./tag-normalization";
 import type { OpportunityFiltersState } from "@/app/opportunities/_components/opportunities-screen/types";
-
-export type OpportunityServerFilters = Pick<
-  OpportunityFiltersState,
-  | "repository"
-  | "region"
-  | "country"
-  | "sortOrder"
-  | "searchText"
-  | "tags"
-  | "authors"
->;
+import type { OpportunityServerFilters } from "@/lib/opportunities/api";
 
 function uniqueValues(values: string[]) {
   return [...new Set(values.map((value) => value.trim()).filter(Boolean))];

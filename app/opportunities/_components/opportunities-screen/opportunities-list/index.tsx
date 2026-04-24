@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useI18n } from "@/components/providers/i18n-provider";
 import { panelStyles, resultsGridStyles } from "@/app/opportunities/_components/opportunities-screen/styles";
-import { formatTemplate } from "@/app/opportunities/_components/opportunities-screen/shared/format-template";
+import { formatTemplate } from "@/lib/utils/format-template";
 import { cn } from "@/lib/utils/tailwind";
 import type { OpportunitiesListProps } from "@/app/opportunities/_components/opportunities-screen/types";
 import { EmptyState } from "./empty-state";

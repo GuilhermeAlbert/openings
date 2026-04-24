@@ -1,5 +1,4 @@
 import {
-  AVAILABLE_LOCALES,
   DEFAULT_LOCALE,
   type LocaleCode,
 } from "@/lib/constants/locales";
@@ -23,5 +22,3 @@ const TRANSLATIONS_BY_LOCALE: Record<LocaleCode, TranslationMessages> = {
 export function getTranslations(locale: LocaleCode): TranslationMessages {
   return TRANSLATIONS_BY_LOCALE[locale] ?? TRANSLATIONS_BY_LOCALE[DEFAULT_LOCALE];
 }
-
-export const TRANSLATION_LOCALES = AVAILABLE_LOCALES;

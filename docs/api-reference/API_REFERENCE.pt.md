@@ -1,22 +1,49 @@
 # Referência da API
 
-Este documento descreve a direção da API pública do openings.dev.
+O front-end do openings.dev consome uma API estática em JSON publicada pelo repositório `openings-dev/data` via URLs raw do GitHub.
 
-A API expõe o mesmo índice de vagas normalizado usado pela aplicação web, permitindo integrações, automações e análises em produtos de terceiros.
+Não existe endpoint local `/api/opportunities` no front-end. Consumidores devem ler os arquivos estáticos remotos diretamente.
 
-## Status
+## URLs base
 
-A API é pública e está em evolução contínua. Alguns contratos podem mudar conforme os filtros e regras de normalização amadurecem.
+```txt
+https://raw.githubusercontent.com/openings-dev/data/main/snapshots/opportunities
+https://raw.githubusercontent.com/openings-dev/data/main
+```
 
-## Objetivos de design
+Use a primeira URL para oportunidades e arquivos da API estática. Use a segunda para o catálogo de repositórios.
 
-- Schema consistente entre diferentes repositórios de origem.
-- Paginação previsível para sincronização incremental.
-- Identificadores estáveis para deduplicação.
-- Campos explícitos para stack, senioridade, remoto e localização.
+## Arquivos principais
+
+- `api/manifest.json`
+- `api/order/recent.json`
+- `api/page-lookup.json`
+- `api/pages/page-0001.json`
+- `api/jobs/<bucket>.json`
+- `api/job-ids.json`
+- `api/facet-index.json`
+- `api/search-index.json`
+- `index.json`
+- `countries/<country-code>/index.json`
+
+## Exemplo
+
+```ts
+const baseUrl =
+  "https://raw.githubusercontent.com/openings-dev/data/main/snapshots/opportunities";
+
+const manifest = await fetch(`${baseUrl}/api/manifest.json`).then((response) =>
+  response.json(),
+);
+```
+
+## Observações
+
+- Os dados vêm de fontes públicas do GitHub.
+- O front-end não usa JSON local, mocks ou fallback local de dados.
+- `generatedAt` indica a atualização do snapshot.
+- A vaga deve sempre apontar para a issue original para validação final.
 
 ## Suporte
-
-Para dúvidas e sugestões de integração:
 
 - [GitHub Issues](https://github.com/openings-dev/openings/issues)

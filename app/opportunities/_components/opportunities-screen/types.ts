@@ -1,6 +1,7 @@
 export type {
   CommunityProfileSummary,
   OpportunityCommunity,
+  OpportunityFilterFacets,
   OpportunityItem,
   OpportunityPerson,
   OpportunitySalary,
@@ -8,11 +9,10 @@ export type {
   OpportunitySourceType,
   UserProfileSummary,
   OpportunityViewMode,
-} from "./types/domain-types";
+} from "@/lib/opportunities/types";
 export type {
   FilterOption,
   OnFilterFieldChange,
-  OpportunityFilterFacets,
   OpportunityFilterOptions,
   OpportunityFiltersState,
   OpportunityTagCategoryOptions,

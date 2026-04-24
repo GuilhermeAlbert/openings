@@ -1,9 +1,19 @@
 import type {
   OpportunityFilterFacets,
   OpportunityItem,
-} from "@/app/opportunities/_components/opportunities-screen/types";
+  OpportunitySortOrder,
+} from "@/lib/opportunities/types";
 import { openingsDataUrl } from "@/lib/opportunities/static-api";
-import type { OpportunityServerFilters } from "./server-filters";
+
+export interface OpportunityServerFilters {
+  repository: string;
+  region: string;
+  country: string;
+  tags: string[];
+  authors: string[];
+  searchText: string;
+  sortOrder: OpportunitySortOrder;
+}
 
 const EMPTY_FACETS: OpportunityFilterFacets = {
   repositories: {},
@@ -85,14 +95,17 @@ async function fetchStaticJson<T>(
     if (!response.ok) {
       throw new Error(`Failed to load data file ${path} (${response.status})`);
     }
+
     return response.json() as Promise<T>;
   });
+
   jsonCache.set(cacheKey, promise);
   promise.catch(() => {
     if (jsonCache.get(cacheKey) === promise) {
       jsonCache.delete(cacheKey);
     }
   });
+
   return promise;
 }
 
@@ -126,24 +139,30 @@ function selectedDimensionIds(
   if (key === "repositories" && filters.repository !== "all") {
     return dimensions.repositories[filters.repository] ?? [];
   }
+
   if (key === "regions" && filters.region !== "all") {
     return dimensions.regions[filters.region] ?? [];
   }
+
   if (key === "countries" && filters.country !== "all") {
     return dimensions.countries[filters.country] ?? [];
   }
+
   if (key === "tags" && filters.tags.length > 0) {
     return unionDimensionIds(dimensions.tags, filters.tags);
   }
+
   if (key === "authors" && filters.authors.length > 0) {
     return unionDimensionIds(dimensions.authors, filters.authors);
   }
+
   return null;
 }
 
 function buildSearchHits(searchIndex: StaticSearchIndex, searchText: string) {
   const query = normalizeSearchText(searchText);
   if (!query) return null;
+
   return new Set(
     searchIndex.items
       .filter((entry) => entry.text.includes(query))
@@ -190,6 +209,7 @@ function countDimension(ids: string[], dimension: Record<string, string[]>) {
       (total, id) => total + (base.has(id) ? 1 : 0),
       0,
     );
+
     if (count > 0) counts[value] = count;
   }
 
@@ -232,15 +252,12 @@ async function loadItems(ids: string[], manifest: StaticManifest) {
     .filter((item): item is OpportunityItem => Boolean(item));
 }
 
-export function buildApiUrl() {
-  return openingsDataUrl("api/manifest.json");
-}
-
 export async function fetchOpportunityById(id: string) {
   const bucket = id.replace(/^gh_/, "").slice(0, 2) || "unknown";
   const payload = await fetchStaticJson<{ items?: Record<string, OpportunityItem> }>(
     `api/jobs/${encodeURIComponent(bucket)}.json`,
   );
+
   return payload.items?.[id] ?? null;
 }
 

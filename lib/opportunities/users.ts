@@ -4,7 +4,7 @@ import {
   dateToMs,
   locationKey,
   mostFrequentLocation,
-} from "./user-summary-helpers";
+} from "./summary-helpers";
 
 type UnknownRecord = Record<string, unknown>;
 

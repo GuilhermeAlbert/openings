@@ -80,9 +80,7 @@ export function useRepositoryFilterRegistry() {
       .then((nextRegistry) => {
         if (isCurrent) setRegistry(nextRegistry);
       })
-      .catch((error) => {
-        console.error(error);
-      })
+      .catch(() => undefined)
       .finally(() => {
         if (isCurrent) setIsLoading(false);
       });

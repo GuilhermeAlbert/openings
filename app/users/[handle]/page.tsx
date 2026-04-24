@@ -16,8 +16,7 @@ export async function generateStaticParams() {
   try {
     const handles = await listSnapshotAuthorHandles();
     return handles.map((handle) => ({ handle }));
-  } catch (error) {
-    console.error("Failed to generate static params for /users", error);
+  } catch {
     return [];
   }
 }

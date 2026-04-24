@@ -1,4 +1,4 @@
-import type { OpportunitySalary } from "@/app/opportunities/_components/opportunities-screen/types";
+import type { OpportunitySalary } from "@/lib/opportunities/types";
 
 interface PeriodLabels {
   month: string;
