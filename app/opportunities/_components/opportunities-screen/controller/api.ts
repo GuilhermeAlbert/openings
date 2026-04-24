@@ -1,4 +1,26 @@
-import type { OpportunityFiltersState, OpportunityItem } from "@/app/opportunities/_components/opportunities-screen/types";
+import type {
+  OpportunityFilterFacets,
+  OpportunityFiltersState,
+  OpportunityItem,
+} from "@/app/opportunities/_components/opportunities-screen/types";
+
+const EMPTY_FACETS: OpportunityFilterFacets = {
+  repositories: {},
+  regions: {},
+  countries: {},
+  tags: {},
+  authors: {},
+  authorLabels: {},
+};
+
+export interface OpportunitiesApiMeta {
+  snapshotGeneratedAt: string | null;
+  deployedAt: string | null;
+  lastUpdatedAt: string | null;
+  totalCount: number;
+  filteredCount: number;
+  facets: OpportunityFilterFacets;
+}
 
 export interface OpportunitiesApiPayload {
   items: OpportunityItem[];
@@ -6,6 +28,53 @@ export interface OpportunitiesApiPayload {
   hasMore: boolean;
   rateLimited: boolean;
   retryAfterSeconds: number | null;
+  meta: OpportunitiesApiMeta;
+}
+
+function parseFacetCountRecord(value: unknown) {
+  if (!value || typeof value !== "object") {
+    return {};
+  }
+  return Object.entries(value as Record<string, unknown>).reduce<Record<string, number>>(
+    (accumulator, [key, count]) => {
+      if (typeof count === "number" && Number.isFinite(count) && count >= 0) {
+        accumulator[key] = Math.floor(count);
+      }
+      return accumulator;
+    },
+    {},
+  );
+}
+
+function parseFacetLabelRecord(value: unknown) {
+  if (!value || typeof value !== "object") {
+    return {};
+  }
+  return Object.entries(value as Record<string, unknown>).reduce<Record<string, string>>(
+    (accumulator, [key, label]) => {
+      if (typeof label === "string") {
+        accumulator[key] = label;
+      }
+      return accumulator;
+    },
+    {},
+  );
+}
+
+function parseFacets(value: unknown): OpportunityFilterFacets {
+  if (!value || typeof value !== "object") {
+    return EMPTY_FACETS;
+  }
+
+  const record = value as Partial<OpportunityFilterFacets>;
+  return {
+    repositories: parseFacetCountRecord(record.repositories),
+    regions: parseFacetCountRecord(record.regions),
+    countries: parseFacetCountRecord(record.countries),
+    tags: parseFacetCountRecord(record.tags),
+    authors: parseFacetCountRecord(record.authors),
+    authorLabels: parseFacetLabelRecord(record.authorLabels),
+  };
 }
 
 export function buildApiUrl(
@@ -28,10 +97,28 @@ export function buildApiUrl(
 
 export function parseApiPayload(payload: unknown): OpportunitiesApiPayload {
   if (!payload || typeof payload !== "object") {
-    return { items: [], nextCursor: null, hasMore: false, rateLimited: false, retryAfterSeconds: null };
+    return {
+      items: [],
+      nextCursor: null,
+      hasMore: false,
+      rateLimited: false,
+      retryAfterSeconds: null,
+      meta: {
+        snapshotGeneratedAt: null,
+        deployedAt: null,
+        lastUpdatedAt: null,
+        totalCount: 0,
+        filteredCount: 0,
+        facets: EMPTY_FACETS,
+      },
+    };
   }
 
   const data = payload as Partial<OpportunitiesApiPayload>;
+  const metaRecord =
+    data.meta && typeof data.meta === "object"
+      ? (data.meta as Partial<OpportunitiesApiMeta>)
+      : null;
   const retryAfterSeconds =
     typeof data.retryAfterSeconds === "number" && Number.isFinite(data.retryAfterSeconds) && data.retryAfterSeconds > 0
       ? Math.floor(data.retryAfterSeconds)
@@ -43,6 +130,33 @@ export function parseApiPayload(payload: unknown): OpportunitiesApiPayload {
     hasMore: Boolean(data.hasMore),
     rateLimited: Boolean(data.rateLimited),
     retryAfterSeconds,
+    meta: {
+      snapshotGeneratedAt:
+        typeof metaRecord?.snapshotGeneratedAt === "string"
+          ? metaRecord.snapshotGeneratedAt
+          : null,
+      deployedAt:
+        typeof metaRecord?.deployedAt === "string"
+          ? metaRecord.deployedAt
+          : null,
+      lastUpdatedAt:
+        typeof metaRecord?.lastUpdatedAt === "string"
+          ? metaRecord.lastUpdatedAt
+          : null,
+      totalCount:
+        typeof metaRecord?.totalCount === "number" &&
+        Number.isFinite(metaRecord.totalCount) &&
+        metaRecord.totalCount >= 0
+          ? Math.floor(metaRecord.totalCount)
+          : 0,
+      filteredCount:
+        typeof metaRecord?.filteredCount === "number" &&
+        Number.isFinite(metaRecord.filteredCount) &&
+        metaRecord.filteredCount >= 0
+          ? Math.floor(metaRecord.filteredCount)
+          : 0,
+      facets: parseFacets(metaRecord?.facets),
+    },
   };
 }
 

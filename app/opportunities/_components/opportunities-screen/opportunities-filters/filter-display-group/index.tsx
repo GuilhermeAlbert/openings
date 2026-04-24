@@ -36,7 +36,7 @@ export function FilterDisplayGroup({
 }: FilterDisplayGroupProps) {
   return (
     <FilterSection label={labels.section}>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground/85">{labels.itemsPerPage}</p>
           <Select

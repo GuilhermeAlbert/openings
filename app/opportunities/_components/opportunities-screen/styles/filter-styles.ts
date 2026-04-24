@@ -16,7 +16,9 @@ export const textInputStyles = cva(
   "h-9 w-full rounded-md border border-input/75 bg-background/60 px-3 text-sm text-foreground transition-colors placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card",
 );
 
-export const compactSelectTriggerStyles = cva("h-9 border-input/75 bg-background/60 text-sm");
+export const compactSelectTriggerStyles = cva(
+  "h-9 min-w-0 border-input/75 bg-background/60 text-sm [&>[data-slot='select-value']]:min-w-0 [&>[data-slot='select-value']]:truncate [&>[data-slot='select-value']]:whitespace-nowrap [&>[data-slot='select-value']]:text-left",
+);
 
 export const toggleGroupStyles = cva(
   "inline-flex items-center rounded-lg border border-border/60 bg-muted/20 p-0.5",

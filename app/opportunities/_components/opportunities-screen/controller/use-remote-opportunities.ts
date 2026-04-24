@@ -3,7 +3,11 @@ import { toast } from "sonner";
 import { fetchOpportunitiesPage } from "./api";
 import { dedupeOpportunities } from "./filtering";
 import { INITIAL_BATCH_SIZE, LOAD_MORE_BATCH_SIZE } from "./defaults";
-import type { OpportunityFiltersState, OpportunityItem } from "@/app/opportunities/_components/opportunities-screen/types";
+import type {
+  OpportunityFilterFacets,
+  OpportunityFiltersState,
+  OpportunityItem,
+} from "@/app/opportunities/_components/opportunities-screen/types";
 
 interface UseRemoteOpportunitiesParams {
   serverFilters: Pick<OpportunityFiltersState, "repository" | "region" | "country" | "sortOrder">;
@@ -17,11 +21,16 @@ export function useRemoteOpportunities({
   onBeforeReload,
 }: UseRemoteOpportunitiesParams) {
   const [opportunities, setOpportunities] = React.useState<OpportunityItem[]>([]);
+  const [facetCounts, setFacetCounts] = React.useState<OpportunityFilterFacets | null>(null);
+  const [snapshotGeneratedAt, setSnapshotGeneratedAt] = React.useState<string | null>(null);
+  const [lastUpdatedAt, setLastUpdatedAt] = React.useState<string | null>(null);
   const [nextCursor, setNextCursor] = React.useState<string | null>(null);
   const [hasMoreRemote, setHasMoreRemote] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isFetchingMore, setIsFetchingMore] = React.useState(false);
   const fetchAbortRef = React.useRef<AbortController | null>(null);
+  const inFlightCursorRef = React.useRef<string | null>(null);
+  const exhaustedCursorsRef = React.useRef(new Set<string>());
 
   React.useEffect(() => {
     const controller = new AbortController();
@@ -34,6 +43,11 @@ export function useRemoteOpportunities({
       setHasMoreRemote(true);
       setNextCursor(null);
       setOpportunities([]);
+      setFacetCounts(null);
+      setSnapshotGeneratedAt(null);
+      setLastUpdatedAt(null);
+      inFlightCursorRef.current = null;
+      exhaustedCursorsRef.current.clear();
       onBeforeReload();
     });
 
@@ -45,6 +59,9 @@ export function useRemoteOpportunities({
       .then((payload) => {
         if (controller.signal.aborted) return;
         setOpportunities(payload.items);
+        setFacetCounts(payload.meta.facets);
+        setSnapshotGeneratedAt(payload.meta.snapshotGeneratedAt);
+        setLastUpdatedAt(payload.meta.lastUpdatedAt);
         setNextCursor(payload.rateLimited ? null : payload.nextCursor);
         setHasMoreRemote(payload.rateLimited ? false : payload.hasMore);
         if (payload.rateLimited) toast.error(messages.rateLimited);
@@ -64,26 +81,55 @@ export function useRemoteOpportunities({
 
   const loadMoreFromApi = React.useCallback(async () => {
     if (!nextCursor || !hasMoreRemote) return false;
+    const requestedCursor = nextCursor;
+    if (inFlightCursorRef.current === requestedCursor) return false;
+    if (exhaustedCursorsRef.current.has(requestedCursor)) return false;
+
+    inFlightCursorRef.current = requestedCursor;
+
     try {
       const payload = await fetchOpportunitiesPage(serverFilters, {
-        cursor: nextCursor,
+        cursor: requestedCursor,
         limit: LOAD_MORE_BATCH_SIZE,
       });
-      setOpportunities((previous) => dedupeOpportunities([...previous, ...payload.items]));
-      setNextCursor(payload.rateLimited ? null : payload.nextCursor);
-      setHasMoreRemote(payload.rateLimited ? false : payload.hasMore);
+      let hasNewItems = false;
+      setOpportunities((previous) => {
+        const merged = dedupeOpportunities([...previous, ...payload.items]);
+        hasNewItems = merged.length > previous.length;
+        return merged;
+      });
+      setFacetCounts(payload.meta.facets);
+      setSnapshotGeneratedAt(payload.meta.snapshotGeneratedAt);
+      setLastUpdatedAt(payload.meta.lastUpdatedAt);
+      const nextCursorValue = payload.rateLimited ? null : payload.nextCursor;
+      const stalledCursor = nextCursorValue !== null && nextCursorValue === requestedCursor;
+      const canContinue = !payload.rateLimited &&
+        payload.hasMore &&
+        Boolean(nextCursorValue) &&
+        !stalledCursor;
+      setNextCursor(canContinue ? nextCursorValue : null);
+      setHasMoreRemote(canContinue);
+      if (!canContinue) exhaustedCursorsRef.current.add(requestedCursor);
       if (payload.rateLimited) toast.error(messages.rateLimited);
-      return !payload.rateLimited && payload.items.length > 0;
+      return hasNewItems;
     } catch (error) {
       console.error(error);
       setHasMoreRemote(false);
+      exhaustedCursorsRef.current.add(requestedCursor);
       toast.error(messages.loadMoreError);
       return false;
+    } finally {
+      if (inFlightCursorRef.current === requestedCursor) {
+        inFlightCursorRef.current = null;
+      }
     }
   }, [hasMoreRemote, messages.loadMoreError, messages.rateLimited, nextCursor, serverFilters]);
 
   return {
     opportunities,
+    facetCounts,
+    snapshotGeneratedAt,
+    lastUpdatedAt,
     nextCursor,
     hasMoreRemote,
     isLoading,

@@ -1,5 +1,6 @@
 import type { OpportunitySortOrder } from "@/app/opportunities/_components/opportunities-screen/types";
 import { FilterDisplayGroup } from "../filter-display-group";
+import { FilterLocationGroup } from "../filter-location-group";
 import { FilterScopeGroup } from "../filter-scope-group";
 import { FilterSearch } from "../filter-search";
 import { FilterTaxonomyGroup } from "../filter-taxonomy-group";
@@ -19,6 +20,20 @@ export function FilterFields({
 }: FilterFieldsProps) {
   return (
     <div className="space-y-3">
+      <FilterLocationGroup
+        state={state}
+        options={options}
+        labels={{
+          section: labels.locationSectionLabel,
+          region: labels.regionLabel,
+          regionPlaceholder: labels.regionPlaceholder,
+          allRegions: labels.allRegions,
+          country: labels.countryLabel,
+          countryPlaceholder: labels.countryPlaceholder,
+          allCountries: labels.allCountries,
+        }}
+        onFieldChange={onFieldChange}
+      />
       <FilterSearch
         label={labels.searchLabel}
         placeholder={labels.searchPlaceholder}
@@ -33,12 +48,6 @@ export function FilterFields({
           repository: labels.repositoryLabel,
           repositoryPlaceholder: labels.repositoryPlaceholder,
           allRepositories: labels.allRepositories,
-          region: labels.regionLabel,
-          regionPlaceholder: labels.regionPlaceholder,
-          allRegions: labels.allRegions,
-          country: labels.countryLabel,
-          countryPlaceholder: labels.countryPlaceholder,
-          allCountries: labels.allCountries,
         }}
         onFieldChange={onFieldChange}
       />
@@ -47,8 +56,14 @@ export function FilterFields({
         options={options}
         labels={{
           section: labels.taxonomySectionLabel,
-          tags: labels.tagsLabel,
-          tagsPlaceholder: labels.tagsPlaceholder,
+          workModeLabel: labels.workModeLabel,
+          workModePlaceholder: labels.workModePlaceholder,
+          stackLabel: labels.stackLabel,
+          stackPlaceholder: labels.stackPlaceholder,
+          seniorityLabel: labels.seniorityLabel,
+          seniorityPlaceholder: labels.seniorityPlaceholder,
+          otherTagsLabel: labels.otherTagsLabel,
+          otherTagsPlaceholder: labels.otherTagsPlaceholder,
           noTagsSelected: labels.noTagsSelected,
           authors: labels.authorLabel,
           authorPlaceholder: labels.authorPlaceholder,

@@ -19,11 +19,28 @@ export interface FilterOption {
   count: number;
 }
 
+export interface OpportunityFilterFacets {
+  repositories: Record<string, number>;
+  regions: Record<string, number>;
+  countries: Record<string, number>;
+  tags: Record<string, number>;
+  authors: Record<string, number>;
+  authorLabels: Record<string, string>;
+}
+
+export interface OpportunityTagCategoryOptions {
+  workModel: FilterOption[];
+  stack: FilterOption[];
+  seniority: FilterOption[];
+  other: FilterOption[];
+}
+
 export interface OpportunityFilterOptions {
   repositories: FilterOption[];
   regions: FilterOption[];
   countries: FilterOption[];
   tags: FilterOption[];
+  tagCategories: OpportunityTagCategoryOptions;
   authors: FilterOption[];
   itemsPerPage: number[];
 }

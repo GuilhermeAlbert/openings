@@ -1,7 +1,6 @@
 import * as React from "react";
 import { toast } from "sonner";
 import { DEFAULT_FILTERS } from "./defaults";
-import { detectCountryFromNavigator } from "./country";
 import { parseFiltersFromSearchParams } from "./url-filters";
 import type {
   OnFilterFieldChange,
@@ -10,10 +9,8 @@ import type {
 
 interface UseFiltersStateParams {
   searchParamsValue: string;
-  hasSearchCountry: boolean;
   forcedRepository: string | null;
   forcedAuthor: string | null;
-  hasForcedScope: boolean;
   resetSuccessMessage: string;
 }
 
@@ -22,14 +19,6 @@ export function useFiltersState(params: UseFiltersStateParams) {
     const parsed = parseFiltersFromSearchParams(new URLSearchParams(params.searchParamsValue));
     if (params.forcedRepository) parsed.repository = params.forcedRepository;
     if (params.forcedAuthor) parsed.authors = [params.forcedAuthor];
-    const shouldDetectCountry =
-      !params.hasForcedScope &&
-      !params.hasSearchCountry &&
-      parsed.country === DEFAULT_FILTERS.country;
-    if (shouldDetectCountry) {
-      const detectedCountry = detectCountryFromNavigator();
-      if (detectedCountry) parsed.country = detectedCountry;
-    }
     return parsed;
   });
 

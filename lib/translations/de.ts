@@ -23,6 +23,60 @@ export const deTranslations: TranslationMessages = {
     description:
       "openings.dev verfolgt Job-Issues aus verlässlichen Communities, normalisiert jeden Eintrag und ermöglicht Filter nach Stack, Seniorität, Standort und Remote-Regelung ohne Wechsel zwischen Repositories.",
   },
+  communities: {
+    header: {
+      kicker: "Communities",
+      title: "Im System verfügbare Communities",
+      description:
+        "Durchsuche registrierte Communities, filtere nach Land und Region und öffne eine Community, um veröffentlichte Jobs zu sehen.",
+    },
+    filters: {
+      title: "Filter",
+      country: "Land",
+      region: "Region",
+      allCountries: "Alle Länder",
+      allRegions: "Alle Regionen",
+      optionWithCount: "{label} ({count})",
+      clear: "Filter löschen",
+    },
+    list: {
+      summary: "{count} Communities gefunden",
+      emptyTitle: "Keine Communities für die aktuellen Filter",
+      emptyDescription: "Passe Land oder Region an, um mehr Ergebnisse zu sehen.",
+      repositoryLabel: "Repository",
+      countryLabel: "Land",
+      regionLabel: "Region",
+      opportunitiesCount: "{count} offene Opportunities",
+      openCommunity: "Community öffnen",
+    },
+  },
+  users: {
+    header: {
+      kicker: "Nutzer",
+      title: "Aktive Nutzer im System",
+      description:
+        "Durchsuche registrierte Autoren, filtere nach Land und Region und öffne ein Profil, um veröffentlichte Opportunities je Person zu sehen.",
+    },
+    filters: {
+      title: "Filter",
+      country: "Land",
+      region: "Region",
+      allCountries: "Alle Länder",
+      allRegions: "Alle Regionen",
+      optionWithCount: "{label} ({count})",
+      clear: "Filter löschen",
+    },
+    list: {
+      summary: "{count} Nutzer gefunden",
+      emptyTitle: "Keine Nutzer für die aktuellen Filter",
+      emptyDescription: "Passe Land oder Region an, um mehr Ergebnisse zu sehen.",
+      handleLabel: "Nutzer",
+      countryLabel: "Land",
+      regionLabel: "Region",
+      opportunitiesCount: "{count} offene Opportunities",
+      openUser: "Profil öffnen",
+    },
+  },
   opportunities: {
     header: {
       kicker: "Opportunity Explorer",
@@ -42,6 +96,14 @@ export const deTranslations: TranslationMessages = {
       zeroResults: "0 Ergebnisse",
       rangeOfTotal: "{start}-{end} von {total}",
     },
+    status: {
+      ariaLabel: "Status des Opportunity-Snapshots",
+      title: "Letztes API-Update",
+      opportunitiesFound: "{count} Opportunities gefunden",
+      updatedRelative: "Aktualisiert {relative}",
+      updatedAt: "Letzte Aktualisierung: {date}",
+      updatedUnavailable: "Aktualisierungszeit nicht verfügbar",
+    },
     filters: {
       ariaLabel: "Opportunity-Filter",
       title: "Filter",
@@ -52,6 +114,8 @@ export const deTranslations: TranslationMessages = {
       searchLabel: "Opportunity suchen",
       searchPlaceholder:
         "Nach Titel, Unternehmen, Repository oder Stichwort suchen",
+      locationSectionLabel: "Standort",
+      repositorySectionLabel: "Repository",
       repositoryLabel: "Repository",
       repositoryPlaceholder: "Alle Repositories",
       allRepositories: "Alle Repositories",
@@ -61,6 +125,14 @@ export const deTranslations: TranslationMessages = {
       countryLabel: "Land",
       countryPlaceholder: "Alle Länder",
       allCountries: "Alle Länder",
+      workModeLabel: "Arbeitsmodell",
+      workModePlaceholder: "Arbeitsmodell hinzufügen",
+      stackLabel: "Stack / Technologie",
+      stackPlaceholder: "Stack hinzufügen",
+      seniorityLabel: "Senioritätslevel",
+      seniorityPlaceholder: "Seniorität hinzufügen",
+      otherTagsLabel: "Weitere Tags",
+      otherTagsPlaceholder: "Weiteren Tag hinzufügen",
       tagsLabel: "Tags",
       tagsPlaceholder: "Tag-Filter hinzufügen",
       noTagsSelected: "Keine Tags ausgewählt",

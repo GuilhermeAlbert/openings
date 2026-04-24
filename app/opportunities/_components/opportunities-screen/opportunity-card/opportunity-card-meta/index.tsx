@@ -12,12 +12,14 @@ interface OpportunityCardMetaProps {
   item: OpportunityItem;
   salaryLabel: string;
   dateLabel: string;
+  showRepository?: boolean;
 }
 
 export function OpportunityCardMeta({
   item,
   salaryLabel,
   dateLabel,
+  showRepository = true,
 }: OpportunityCardMetaProps) {
   return (
     <div className={metadataRowStyles()}>
@@ -33,10 +35,12 @@ export function OpportunityCardMeta({
           {item.companyName}
         </span>
       ) : null}
-      <span className="inline-flex items-center gap-1">
-        <Landmark className="size-3.5" />
-        {item.community.repository}
-      </span>
+      {showRepository ? (
+        <span className="inline-flex items-center gap-1">
+          <Landmark className="size-3.5" />
+          {item.community.repository}
+        </span>
+      ) : null}
       <span className="inline-flex items-center gap-1">
         <MapPin className="size-3.5" />
         {item.country}

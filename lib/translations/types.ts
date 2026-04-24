@@ -25,6 +25,58 @@ export interface TranslationMessages {
     title: string;
     description: string;
   };
+  communities: {
+    header: {
+      kicker: string;
+      title: string;
+      description: string;
+    };
+    filters: {
+      title: string;
+      country: string;
+      region: string;
+      allCountries: string;
+      allRegions: string;
+      optionWithCount: string;
+      clear: string;
+    };
+    list: {
+      summary: string;
+      emptyTitle: string;
+      emptyDescription: string;
+      repositoryLabel: string;
+      countryLabel: string;
+      regionLabel: string;
+      opportunitiesCount: string;
+      openCommunity: string;
+    };
+  };
+  users: {
+    header: {
+      kicker: string;
+      title: string;
+      description: string;
+    };
+    filters: {
+      title: string;
+      country: string;
+      region: string;
+      allCountries: string;
+      allRegions: string;
+      optionWithCount: string;
+      clear: string;
+    };
+    list: {
+      summary: string;
+      emptyTitle: string;
+      emptyDescription: string;
+      handleLabel: string;
+      countryLabel: string;
+      regionLabel: string;
+      opportunitiesCount: string;
+      openUser: string;
+    };
+  };
   opportunities: {
     header: {
       kicker: string;
@@ -41,6 +93,14 @@ export interface TranslationMessages {
       zeroResults: string;
       rangeOfTotal: string;
     };
+    status: {
+      ariaLabel: string;
+      title: string;
+      opportunitiesFound: string;
+      updatedRelative: string;
+      updatedAt: string;
+      updatedUnavailable: string;
+    };
     filters: {
       ariaLabel: string;
       title: string;
@@ -50,6 +110,8 @@ export interface TranslationMessages {
       reset: string;
       searchLabel: string;
       searchPlaceholder: string;
+      locationSectionLabel: string;
+      repositorySectionLabel: string;
       repositoryLabel: string;
       repositoryPlaceholder: string;
       allRepositories: string;
@@ -59,6 +121,14 @@ export interface TranslationMessages {
       countryLabel: string;
       countryPlaceholder: string;
       allCountries: string;
+      workModeLabel: string;
+      workModePlaceholder: string;
+      stackLabel: string;
+      stackPlaceholder: string;
+      seniorityLabel: string;
+      seniorityPlaceholder: string;
+      otherTagsLabel: string;
+      otherTagsPlaceholder: string;
       tagsLabel: string;
       tagsPlaceholder: string;
       noTagsSelected: string;

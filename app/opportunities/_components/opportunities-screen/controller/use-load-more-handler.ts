@@ -15,21 +15,53 @@ interface UseLoadMoreHandlerParams {
 }
 
 export function useLoadMoreHandler(params: UseLoadMoreHandlerParams) {
+  const {
+    currentPage,
+    totalPages,
+    isLoading,
+    isFetchingMore,
+    hasMoreRemote,
+    nextCursor,
+    setIsFetchingMore,
+    setFilters,
+    loadMoreFromApi,
+  } = params;
+  const loadLockRef = React.useRef(false);
+
   return React.useCallback(async () => {
-    if (params.isLoading || params.isFetchingMore) return;
-    if (params.currentPage < params.totalPages) {
-      params.setFilters((previous) => ({
+    if (loadLockRef.current || isLoading || isFetchingMore) return;
+
+    if (currentPage < totalPages) {
+      setFilters((previous) => ({
         ...previous,
-        page: Math.min(previous.page + 1, params.totalPages),
+        page: Math.min(previous.page + 1, totalPages),
       }));
       return;
     }
-    if (!params.hasMoreRemote || !params.nextCursor) return;
-    params.setIsFetchingMore(true);
-    const hasNewItems = await params.loadMoreFromApi();
-    if (hasNewItems) {
-      params.setFilters((previous) => ({ ...previous, page: previous.page + 1 }));
+
+    if (!hasMoreRemote || !nextCursor) return;
+
+    loadLockRef.current = true;
+    setIsFetchingMore(true);
+    try {
+      const hasNewItems = await loadMoreFromApi();
+
+      if (hasNewItems) {
+        setFilters((previous) => ({ ...previous, page: previous.page + 1 }));
+      }
+    } finally {
+      setIsFetchingMore(false);
+      loadLockRef.current = false;
     }
-    params.setIsFetchingMore(false);
-  }, [params]);
+  }, [
+    currentPage,
+    hasMoreRemote,
+    isFetchingMore,
+    isLoading,
+    loadMoreFromApi,
+    nextCursor,
+    setFilters,
+    setIsFetchingMore,
+    totalPages,
+  ]);
 }

@@ -2,44 +2,36 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils/tailwind";
 import type { BrandLogoProps } from "../types";
-import {
-  brandLogoMarkStyles,
-  brandLogoRootStyles,
-  brandLogoTextStyles,
-  brandLogoTitleStyles,
-} from "./styles";
+import { brandLogoMarkStyles, brandLogoRootStyles } from "./styles";
 
 export function BrandLogo({
   className,
   href = "/",
   brandName = "openings.dev",
-  lightLogoSrc = "/light-mode-favicon.svg",
-  darkLogoSrc = "/dark-mode-favicon.svg",
+  lightLogoSrc = "/logo-light.png",
+  darkLogoSrc = "/logo-dark.png",
 }: BrandLogoProps) {
+  const { resolvedTheme } = useTheme();
+  const isDarkTheme = resolvedTheme === "dark";
+  const logoSrc = isDarkTheme ? darkLogoSrc : lightLogoSrc;
+  const logoAlt = isDarkTheme
+    ? `${brandName} dark logo`
+    : `${brandName} light logo`;
+
   return (
     <Link href={href} className={cn(brandLogoRootStyles(), className)}>
       <span className={brandLogoMarkStyles()}>
         <Image
-          src={lightLogoSrc}
-          alt={`${brandName} light logo`}
+          src={logoSrc}
+          alt={logoAlt}
           fill
-          sizes="36px"
+          sizes="190px"
           priority
-          className="object-contain dark:hidden"
+          className="object-contain"
         />
-        <Image
-          src={darkLogoSrc}
-          alt={`${brandName} dark logo`}
-          fill
-          sizes="36px"
-          priority
-          className="hidden object-contain dark:block"
-        />
-      </span>
-      <span className={brandLogoTextStyles()}>
-        <span className={brandLogoTitleStyles()}>{brandName}</span>
       </span>
     </Link>
   );

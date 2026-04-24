@@ -51,7 +51,8 @@ export function OpportunitiesFilters(props: OpportunitiesFiltersProps) {
             <FilterFields
               {...props}
               labels={{
-                scopeSectionLabel: filterMessages.repositoryLabel,
+                locationSectionLabel: filterMessages.locationSectionLabel,
+                scopeSectionLabel: filterMessages.repositorySectionLabel,
                 taxonomySectionLabel: filterMessages.tagsLabel,
                 displaySectionLabel: filterMessages.itemsPerPageLabel,
                 searchLabel: filterMessages.searchLabel,
@@ -65,6 +66,14 @@ export function OpportunitiesFilters(props: OpportunitiesFiltersProps) {
                 countryLabel: filterMessages.countryLabel,
                 countryPlaceholder: filterMessages.countryPlaceholder,
                 allCountries: filterMessages.allCountries,
+                workModeLabel: filterMessages.workModeLabel,
+                workModePlaceholder: filterMessages.workModePlaceholder,
+                stackLabel: filterMessages.stackLabel,
+                stackPlaceholder: filterMessages.stackPlaceholder,
+                seniorityLabel: filterMessages.seniorityLabel,
+                seniorityPlaceholder: filterMessages.seniorityPlaceholder,
+                otherTagsLabel: filterMessages.otherTagsLabel,
+                otherTagsPlaceholder: filterMessages.otherTagsPlaceholder,
                 tagsLabel: filterMessages.tagsLabel,
                 tagsPlaceholder: filterMessages.tagsPlaceholder,
                 noTagsSelected: filterMessages.noTagsSelected,

@@ -3,8 +3,12 @@ const DEFAULT_SNAPSHOT_URL =
 const SNAPSHOT_FETCH_BATCH_SIZE = 12;
 
 type UnknownRecord = Record<string, unknown>;
+interface SnapshotDataset {
+  items: unknown[];
+  generatedAt: string | null;
+}
 
-let snapshotItemsPromise: Promise<unknown[]> | null = null;
+let snapshotDatasetPromise: Promise<SnapshotDataset> | null = null;
 
 function asRecord(value: unknown): UnknownRecord | null {
   if (!value || typeof value !== "object") {
@@ -40,9 +44,12 @@ async function fetchJson(url: string) {
   return response.json().catch(() => null);
 }
 
-function normalizeLegacySnapshotItems(payload: unknown) {
+function normalizeLegacySnapshotPayload(payload: unknown): SnapshotDataset | null {
   if (Array.isArray(payload)) {
-    return payload;
+    return {
+      items: sortAndDedupeSnapshotItems(payload),
+      generatedAt: null,
+    };
   }
 
   const record = asRecord(payload);
@@ -51,7 +58,10 @@ function normalizeLegacySnapshotItems(payload: unknown) {
     return null;
   }
 
-  return record.items;
+  return {
+    items: sortAndDedupeSnapshotItems(record.items),
+    generatedAt: stringOrNull(record.generatedAt),
+  };
 }
 
 function sortAndDedupeSnapshotItems(items: unknown[]) {
@@ -83,7 +93,10 @@ async function fetchJsonInBatches(urls: string[]) {
   return payloads;
 }
 
-async function loadSegmentedSnapshotItems(snapshotUrl: string, payload: unknown) {
+async function loadSegmentedSnapshotItems(
+  snapshotUrl: string,
+  payload: unknown,
+): Promise<SnapshotDataset> {
   const record = asRecord(payload);
 
   if (!record || !Array.isArray(record.countries)) {
@@ -116,27 +129,34 @@ async function loadSegmentedSnapshotItems(snapshotUrl: string, payload: unknown)
     return Array.isArray(shardItems) ? shardItems : [];
   });
 
-  return sortAndDedupeSnapshotItems(items);
+  return {
+    items: sortAndDedupeSnapshotItems(items),
+    generatedAt: stringOrNull(record.generatedAt),
+  };
 }
 
-async function loadSnapshotItemsUncached() {
+async function loadSnapshotDatasetUncached(): Promise<SnapshotDataset> {
   const snapshotUrl = resolveSnapshotUrl();
   const payload = await fetchJson(snapshotUrl);
-  const legacyItems = normalizeLegacySnapshotItems(payload);
+  const legacyPayload = normalizeLegacySnapshotPayload(payload);
 
-  if (legacyItems) {
-    return sortAndDedupeSnapshotItems(legacyItems);
+  if (legacyPayload) {
+    return legacyPayload;
   }
 
   return loadSegmentedSnapshotItems(snapshotUrl, payload);
 }
 
-export function loadSnapshotItems() {
-  if (!snapshotItemsPromise) {
-    snapshotItemsPromise = loadSnapshotItemsUncached();
+export function loadSnapshotDataset() {
+  if (!snapshotDatasetPromise) {
+    snapshotDatasetPromise = loadSnapshotDatasetUncached();
   }
 
-  return snapshotItemsPromise;
+  return snapshotDatasetPromise;
+}
+
+export function loadSnapshotItems() {
+  return loadSnapshotDataset().then((dataset) => dataset.items);
 }
 
 export async function listSnapshotRepositories() {

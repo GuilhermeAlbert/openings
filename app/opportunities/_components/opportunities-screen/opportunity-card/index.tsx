@@ -18,6 +18,8 @@ export function OpportunityCard({
   onSelectOpportunity,
   onCommunitySelect,
   onAuthorSelect,
+  hideCommunityIdentity,
+  hideAuthorIdentity,
 }: OpportunityCardProps) {
   const { locale, messages } = useI18n();
   const cardMessages = messages.opportunities.card;
@@ -52,6 +54,7 @@ export function OpportunityCard({
           item={item}
           salaryLabel={salaryLabel}
           dateLabel={dateFormatter.format(new Date(item.createdAt))}
+          showRepository={!hideCommunityIdentity}
         />
         <OpportunityCardFooter
           item={item}
@@ -59,6 +62,8 @@ export function OpportunityCard({
           authorAvatarAltTemplate={cardMessages.authorAvatarAlt}
           onCommunitySelect={onCommunitySelect}
           onAuthorSelect={onAuthorSelect}
+          showCommunityIdentity={!hideCommunityIdentity}
+          showAuthorIdentity={!hideAuthorIdentity}
         />
       </div>
     </article>

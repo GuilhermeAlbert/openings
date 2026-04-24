@@ -8,14 +8,14 @@ import type { OpportunitiesScreenProps } from "@/app/opportunities/_components/o
 
 export function OpportunitiesScreen(props: OpportunitiesScreenProps) {
   const controller = useOpportunitiesScreenController(props);
-  const { header } = controller.opportunitiesMessages;
 
   return (
     <section className={opportunitiesScreenStyles()}>
       <OpportunitiesScreenHeader
-        kicker={header.kicker}
-        title={header.title}
-        description={header.description}
+        kicker={controller.headerKicker}
+        title={controller.headerTitle}
+        description={controller.headerDescription}
+        profile={controller.profileHeader}
       />
       <OpportunitiesScreenContent controller={controller} />
     </section>

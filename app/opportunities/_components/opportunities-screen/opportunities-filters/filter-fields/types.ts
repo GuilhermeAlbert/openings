@@ -1,6 +1,7 @@
 import type { OpportunitiesFiltersProps } from "@/app/opportunities/_components/opportunities-screen/types";
 
 export interface FilterFieldsLabels {
+  locationSectionLabel: string;
   scopeSectionLabel: string;
   taxonomySectionLabel: string;
   displaySectionLabel: string;
@@ -15,6 +16,14 @@ export interface FilterFieldsLabels {
   countryLabel: string;
   countryPlaceholder: string;
   allCountries: string;
+  workModeLabel: string;
+  workModePlaceholder: string;
+  stackLabel: string;
+  stackPlaceholder: string;
+  seniorityLabel: string;
+  seniorityPlaceholder: string;
+  otherTagsLabel: string;
+  otherTagsPlaceholder: string;
   tagsLabel: string;
   tagsPlaceholder: string;
   noTagsSelected: string;

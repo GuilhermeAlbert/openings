@@ -53,9 +53,6 @@ export function OpportunityDrawer({
     <div className="flex h-full flex-col">
       <DrawerHeader title={item.title} detailsLabel={cardMessages.detailsLabel} closeLabel={cardMessages.closeDetails} onClose={onClose} />
       <div className="flex-1 space-y-5 overflow-y-auto px-4 py-4">
-        <DrawerTags tags={item.tags} />
-        <OpportunityMarkdown body={item.excerpt} />
-        <DrawerMetadata postedAt={postedAt} updatedAt={updatedAt} repository={item.community.repository} country={item.country} companyName={item.companyName} salaryLabel={salaryLabel} />
         <DrawerIdentities
           item={item}
           communityAvatarAltTemplate={cardMessages.communityAvatarAlt}
@@ -63,8 +60,11 @@ export function OpportunityDrawer({
           onCommunitySelect={onCommunitySelect}
           onAuthorSelect={onAuthorSelect}
         />
+        <DrawerAction openOriginalLabel={cardMessages.openOriginal} url={item.url} />
+        <DrawerTags tags={item.tags} />
+        <OpportunityMarkdown body={item.description} />
+        <DrawerMetadata postedAt={postedAt} updatedAt={updatedAt} repository={item.community.repository} country={item.country} companyName={item.companyName} salaryLabel={salaryLabel} />
       </div>
-      <DrawerAction openOriginalLabel={cardMessages.openOriginal} url={item.url} />
     </div>
   );
 

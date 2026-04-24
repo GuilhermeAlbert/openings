@@ -1,8 +1,12 @@
 export {
+  opportunitiesBodyStyles,
   opportunitiesDescriptionStyles,
   opportunitiesHeaderStyles,
   opportunitiesKickerStyles,
+  opportunitiesMainStyles,
   opportunitiesScreenStyles,
+  opportunitiesSidebarStyles,
+  opportunitiesSnapshotStatusStyles,
   opportunitiesTitleStyles,
   panelStyles,
   splitViewStyles,

@@ -1,4 +1,5 @@
 import { DEFAULT_FILTERS } from "./defaults";
+import { canonicalTagValue } from "./tag-normalization";
 import type {
   OpportunityFilterOptions,
   OpportunityFiltersState,
@@ -15,16 +16,23 @@ export function normalizeFilters(
   const countryValues = new Set(options.countries.map((option) => option.value));
   const tagValues = new Set(options.tags.map((option) => option.value));
   const authorValues = new Set(options.authors.map((option) => option.value));
+  const normalizedTags = [...new Set(filters.tags.map((tag) => canonicalTagValue(tag)).filter(Boolean))];
 
   return {
     ...filters,
     repository: forcedRepository ??
-      (repositoryValues.has(filters.repository)
+      (filters.repository === "all" || repositoryValues.has(filters.repository)
         ? filters.repository
         : DEFAULT_FILTERS.repository),
-    region: regionValues.has(filters.region) ? filters.region : DEFAULT_FILTERS.region,
-    country: countryValues.has(filters.country) ? filters.country : DEFAULT_FILTERS.country,
-    tags: filters.tags.filter((tag) => tagValues.has(tag)),
+    region:
+      filters.region === "all" || regionValues.has(filters.region)
+        ? filters.region
+        : DEFAULT_FILTERS.region,
+    country:
+      filters.country === "all" || countryValues.has(filters.country)
+        ? filters.country
+        : DEFAULT_FILTERS.country,
+    tags: normalizedTags.filter((tag) => tagValues.has(tag)),
     authors: forcedAuthor
       ? [forcedAuthor]
       : filters.authors.filter((author) => authorValues.has(author)),

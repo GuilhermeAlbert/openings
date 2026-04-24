@@ -5,12 +5,14 @@ import { buildRangeLabel } from "./range-label";
 import { getFilteredOpportunities } from "./filtering";
 import { normalizeFilters } from "./normalize-filters";
 import type {
+  OpportunityFilterFacets,
   OpportunityFiltersState,
   OpportunityItem,
 } from "@/app/opportunities/_components/opportunities-screen/types";
 
 interface UseDerivedOpportunitiesParams {
   opportunities: OpportunityItem[];
+  facetCounts: OpportunityFilterFacets | null;
   filters: OpportunityFiltersState;
   selectedOpportunityId: string | null;
   forcedRepository: string | null;
@@ -25,8 +27,8 @@ export function useDerivedOpportunities(params: UseDerivedOpportunitiesParams) {
     [params.opportunities],
   );
   const options = React.useMemo(
-    () => buildFilterOptions(openOpportunities),
-    [openOpportunities],
+    () => buildFilterOptions(openOpportunities, params.facetCounts, params.locale),
+    [openOpportunities, params.facetCounts, params.locale],
   );
   const normalizedFilters = React.useMemo(
     () =>

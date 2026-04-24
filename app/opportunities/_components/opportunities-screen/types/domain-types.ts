@@ -32,6 +32,7 @@ export interface OpportunitySalary {
 export interface OpportunityItem {
   id: string;
   title: string;
+  description: string;
   excerpt: string;
   issueState: "open" | "closed";
   repository: RepositoryConfig["repository"];
@@ -47,4 +48,24 @@ export interface OpportunityItem {
   updatedAt: string;
   url: string;
   sourceType: OpportunitySourceType;
+}
+
+export interface UserProfileSummary {
+  handle: string;
+  name: string;
+  avatarUrl: string;
+  region: string;
+  country: string;
+  opportunitiesCount: number;
+  lastPostedAt: string | null;
+}
+
+export interface CommunityProfileSummary {
+  repository: string;
+  name: string;
+  avatarUrl: string;
+  region: string;
+  country: string;
+  opportunitiesCount: number;
+  lastPostedAt: string | null;
 }

@@ -8,6 +8,7 @@ import {
 import { compactSelectTriggerStyles } from "@/app/opportunities/_components/opportunities-screen/styles";
 import { FilterSection } from "../filter-section";
 import { SelectedChipList } from "../selected-chip-list";
+import { TagCategoryPicker } from "./tag-category-picker";
 import type { OpportunityFilterOptions, OpportunityFiltersState } from "@/app/opportunities/_components/opportunities-screen/types";
 
 interface FilterTaxonomyGroupProps {
@@ -17,8 +18,14 @@ interface FilterTaxonomyGroupProps {
   authorPickerVersion: number;
   labels: {
     section: string;
-    tags: string;
-    tagsPlaceholder: string;
+    workModeLabel: string;
+    workModePlaceholder: string;
+    stackLabel: string;
+    stackPlaceholder: string;
+    seniorityLabel: string;
+    seniorityPlaceholder: string;
+    otherTagsLabel: string;
+    otherTagsPlaceholder: string;
     noTagsSelected: string;
     authors: string;
     authorPlaceholder: string;
@@ -41,6 +48,11 @@ export function FilterTaxonomyGroup({
   onAuthorSelected,
   onToggleAuthor,
 }: FilterTaxonomyGroupProps) {
+  const selectedTags = state.tags.map((tag) => ({
+    key: tag,
+    label: options.tags.find((option) => option.value === tag)?.label ?? tag,
+  }));
+
   const selectedAuthors = state.authors.map((author) => ({
     key: author,
     label: options.authors.find((option) => option.value === author)?.label ?? author,
@@ -48,27 +60,40 @@ export function FilterTaxonomyGroup({
 
   return (
     <FilterSection label={labels.section}>
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <div className="space-y-1">
-          <p className="text-xs text-muted-foreground/85">{labels.tags}</p>
-          <Select key={tagPickerVersion} onValueChange={onTagSelected}>
-            <SelectTrigger className={compactSelectTriggerStyles()}>
-              <SelectValue placeholder={labels.tagsPlaceholder} />
-            </SelectTrigger>
-            <SelectContent>
-              {options.tags.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label} ({option.count})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <SelectedChipList
-            items={state.tags.map((tag) => ({ key: tag, label: tag }))}
-            emptyLabel={labels.noTagsSelected}
-            onRemove={onToggleTag}
-          />
-        </div>
+      <div className="grid grid-cols-1 gap-3">
+        <TagCategoryPicker
+          selectKey={`work-model-${tagPickerVersion}`}
+          label={labels.workModeLabel}
+          placeholder={labels.workModePlaceholder}
+          options={options.tagCategories.workModel}
+          onSelect={onTagSelected}
+        />
+        <TagCategoryPicker
+          selectKey={`stack-${tagPickerVersion}`}
+          label={labels.stackLabel}
+          placeholder={labels.stackPlaceholder}
+          options={options.tagCategories.stack}
+          onSelect={onTagSelected}
+        />
+        <TagCategoryPicker
+          selectKey={`seniority-${tagPickerVersion}`}
+          label={labels.seniorityLabel}
+          placeholder={labels.seniorityPlaceholder}
+          options={options.tagCategories.seniority}
+          onSelect={onTagSelected}
+        />
+        <TagCategoryPicker
+          selectKey={`other-tags-${tagPickerVersion}`}
+          label={labels.otherTagsLabel}
+          placeholder={labels.otherTagsPlaceholder}
+          options={options.tagCategories.other}
+          onSelect={onTagSelected}
+        />
+        <SelectedChipList
+          items={selectedTags}
+          emptyLabel={labels.noTagsSelected}
+          onRemove={onToggleTag}
+        />
 
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground/85">{labels.authors}</p>

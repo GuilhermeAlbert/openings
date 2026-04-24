@@ -2,10 +2,16 @@ import { Suspense } from "react";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { OpportunitiesScreen } from "@/app/opportunities/_components/opportunities-screen";
+import type {
+  CommunityProfileSummary,
+  UserProfileSummary,
+} from "@/app/opportunities/_components/opportunities-screen/types";
 
 interface OpportunitiesPageProps {
   forcedRepository?: string;
   forcedAuthor?: string;
+  forcedAuthorProfile?: UserProfileSummary | null;
+  forcedRepositoryProfile?: CommunityProfileSummary | null;
 }
 
 function OpportunitiesFallback() {
@@ -23,6 +29,8 @@ function OpportunitiesFallback() {
 export function OpportunitiesPage({
   forcedRepository,
   forcedAuthor,
+  forcedAuthorProfile,
+  forcedRepositoryProfile,
 }: OpportunitiesPageProps) {
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -32,6 +40,8 @@ export function OpportunitiesPage({
           <OpportunitiesScreen
             forcedRepository={forcedRepository}
             forcedAuthor={forcedAuthor}
+            forcedAuthorProfile={forcedAuthorProfile}
+            forcedRepositoryProfile={forcedRepositoryProfile}
           />
         </Suspense>
       </main>

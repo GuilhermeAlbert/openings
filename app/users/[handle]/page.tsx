@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { OpportunitiesPage } from "@/app/opportunities/_components/opportunities-page";
 import { listSnapshotAuthorHandles } from "@/lib/opportunities/snapshot";
 import { authorHandleFromRoute } from "@/lib/opportunities/routing";
+import { getSnapshotUserByHandle } from "@/lib/opportunities/users";
 
 interface UserProfilePageProps {
   params: Promise<{
@@ -29,5 +30,22 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
     notFound();
   }
 
-  return <OpportunitiesPage forcedAuthor={handle} />;
+  const userSummary = await getSnapshotUserByHandle(handle);
+
+  return (
+    <OpportunitiesPage
+      forcedAuthor={handle}
+      forcedAuthorProfile={
+        userSummary ?? {
+          handle,
+          name: handle,
+          avatarUrl: "",
+          region: "Unknown",
+          country: "Unknown",
+          opportunitiesCount: 0,
+          lastPostedAt: null,
+        }
+      }
+    />
+  );
 }

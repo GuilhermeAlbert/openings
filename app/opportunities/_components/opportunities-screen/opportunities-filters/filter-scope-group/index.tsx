@@ -10,17 +10,8 @@ interface FilterScopeGroupProps {
     repository: string;
     repositoryPlaceholder: string;
     allRepositories: string;
-    region: string;
-    regionPlaceholder: string;
-    allRegions: string;
-    country: string;
-    countryPlaceholder: string;
-    allCountries: string;
   };
-  onFieldChange: (
-    field: "repository" | "region" | "country",
-    value: string,
-  ) => void;
+  onFieldChange: (field: "repository", value: string) => void;
 }
 
 export function FilterScopeGroup({
@@ -31,7 +22,7 @@ export function FilterScopeGroup({
 }: FilterScopeGroupProps) {
   return (
     <FilterSection label={labels.section}>
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground/85">{labels.repository}</p>
           <FilterSelect
@@ -40,26 +31,6 @@ export function FilterScopeGroup({
             allLabel={labels.allRepositories}
             options={options.repositories}
             onValueChange={(value) => onFieldChange("repository", value)}
-          />
-        </div>
-        <div className="space-y-1">
-          <p className="text-xs text-muted-foreground/85">{labels.region}</p>
-          <FilterSelect
-            value={state.region}
-            placeholder={labels.regionPlaceholder}
-            allLabel={labels.allRegions}
-            options={options.regions}
-            onValueChange={(value) => onFieldChange("region", value)}
-          />
-        </div>
-        <div className="space-y-1">
-          <p className="text-xs text-muted-foreground/85">{labels.country}</p>
-          <FilterSelect
-            value={state.country}
-            placeholder={labels.countryPlaceholder}
-            allLabel={labels.allCountries}
-            options={options.countries}
-            onValueChange={(value) => onFieldChange("country", value)}
           />
         </div>
       </div>

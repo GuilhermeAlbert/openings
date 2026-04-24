@@ -13,6 +13,8 @@ interface ResultsGridProps {
   onSelectOpportunity: (item: OpportunityItem) => void;
   onCommunitySelect: (repository: string) => void;
   onAuthorSelect: (authorHandle: string) => void;
+  hideCommunityIdentity: boolean;
+  hideAuthorIdentity: boolean;
 }
 
 export function ResultsGrid({
@@ -22,6 +24,8 @@ export function ResultsGrid({
   onSelectOpportunity,
   onCommunitySelect,
   onAuthorSelect,
+  hideCommunityIdentity,
+  hideAuthorIdentity,
 }: ResultsGridProps) {
   return (
     <motion.div
@@ -46,6 +50,8 @@ export function ResultsGrid({
               onSelectOpportunity={onSelectOpportunity}
               onCommunitySelect={onCommunitySelect}
               onAuthorSelect={onAuthorSelect}
+              hideCommunityIdentity={hideCommunityIdentity}
+              hideAuthorIdentity={hideAuthorIdentity}
             />
           </motion.div>
         ))}

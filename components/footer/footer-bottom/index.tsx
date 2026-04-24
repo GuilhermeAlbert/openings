@@ -43,8 +43,8 @@ export function FooterBottom({
 
   const signatureLogoSrc =
     resolvedTheme === "dark"
-      ? "/brand-mark-dark.svg"
-      : "/brand-mark-light.svg";
+      ? "/trebla-solid-white-logo-inline.svg"
+      : "/trebla-solid-primary-logo-inline.svg";
 
   return (
     <motion.div
@@ -75,19 +75,22 @@ export function FooterBottom({
           </Button>
         ) : null}
 
-        <div className="flex items-center gap-2">
+        <a
+          href="https://treb.la"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 cursor-pointer"
+        >
           <p className={footerSignatureStyles()}>{signature}</p>
+
           <Image
             src={signatureLogoSrc}
             alt="openings.dev logo"
-            width={18}
-            height={18}
-            className="rounded-[4px] border border-border/70 bg-card"
+            width={72}
+            height={72}
+            className="bg-card"
           />
-          <span className="text-sm font-semibold tracking-[-0.01em] text-foreground">
-            openings.dev
-          </span>
-        </div>
+        </a>
       </div>
     </motion.div>
   );

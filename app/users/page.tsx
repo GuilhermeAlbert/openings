@@ -1,5 +1,17 @@
-import { OpportunitiesPage } from "@/app/opportunities/_components/opportunities-page";
+import { UsersPage } from "@/app/users/_components/users-page";
+import type { UserSummary } from "@/lib/opportunities/users";
+import { listSnapshotUsers } from "@/lib/opportunities/users";
 
-export default function UsersIndexPage() {
-  return <OpportunitiesPage />;
+export const revalidate = 10800;
+
+export default async function UsersIndexPage() {
+  let users: UserSummary[] = [];
+
+  try {
+    users = await listSnapshotUsers();
+  } catch (error) {
+    console.error("Failed to load users page", error);
+  }
+
+  return <UsersPage users={users} />;
 }

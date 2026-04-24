@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import type {
+  OpportunityFilterFacets,
   OpportunityItem,
   OpportunitySalary,
   OpportunitySourceType,
 } from "@/app/opportunities/_components/opportunities-screen/types";
-import { loadSnapshotItems } from "@/lib/opportunities/snapshot";
+import { loadSnapshotDataset } from "@/lib/opportunities/snapshot";
 
 export const dynamic = "force-static";
 
@@ -13,6 +14,22 @@ const MIN_LIMIT = 10;
 const MAX_LIMIT = 80;
 
 type SortOrder = "recent" | "oldest";
+type ScopeFilterKey = "repository" | "region" | "country";
+
+interface ScopeFilters {
+  repository: string | null;
+  region: string | null;
+  country: string | null;
+}
+
+const EMPTY_FACETS: OpportunityFilterFacets = {
+  repositories: {},
+  regions: {},
+  countries: {},
+  tags: {},
+  authors: {},
+  authorLabels: {},
+};
 
 interface OpportunitiesApiPayload {
   items: OpportunityItem[];
@@ -20,6 +37,14 @@ interface OpportunitiesApiPayload {
   hasMore: boolean;
   rateLimited: boolean;
   retryAfterSeconds: number | null;
+  meta: {
+    snapshotGeneratedAt: string | null;
+    deployedAt: string | null;
+    lastUpdatedAt: string | null;
+    totalCount: number;
+    filteredCount: number;
+    facets: OpportunityFilterFacets;
+  };
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -48,6 +73,45 @@ function parseOffset(value: string | null) {
 
 function normalizeSortOrder(value: string | null): SortOrder {
   return value === "oldest" ? "oldest" : "recent";
+}
+
+function normalizeIsoDate(value: string | null | undefined) {
+  if (!value) return null;
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed)) return null;
+  return new Date(parsed).toISOString();
+}
+
+const API_DEPLOYED_AT = normalizeIsoDate(
+  process.env.OPENINGS_API_DEPLOYED_AT ||
+    process.env.VERCEL_GIT_COMMIT_DATE ||
+    process.env.VERCEL_DEPLOYMENT_CREATED_AT ||
+    process.env.BUILD_CREATED_AT ||
+    new Date().toISOString(),
+);
+
+function pickLastUpdatedAt(snapshotGeneratedAt: string | null, deployedAt: string | null) {
+  if (!snapshotGeneratedAt) return deployedAt;
+  if (!deployedAt) return snapshotGeneratedAt;
+  return Date.parse(snapshotGeneratedAt) >= Date.parse(deployedAt)
+    ? snapshotGeneratedAt
+    : deployedAt;
+}
+
+function normalizeScopeFilter(value: string | null) {
+  if (!value || value === "all") {
+    return null;
+  }
+
+  return value;
+}
+
+function parseScopeFilters(searchParams: URLSearchParams): ScopeFilters {
+  return {
+    repository: normalizeScopeFilter(searchParams.get("repository")),
+    region: normalizeScopeFilter(searchParams.get("region")),
+    country: normalizeScopeFilter(searchParams.get("country")),
+  };
 }
 
 function asRecord(value: unknown) {
@@ -146,6 +210,10 @@ function normalizeOpportunity(value: unknown): OpportunityItem | null {
     ? Array.from(new Set(record.tags.filter((tag): tag is string => typeof tag === "string" && tag.trim().length > 0))).slice(0, 12)
     : [];
 
+  const description = stringOrNull(record.description) ??
+    stringOrNull(record.body) ??
+    stringOrNull(record.excerpt) ??
+    title;
   const excerpt = stringOrNull(record.excerpt) ?? title;
   const companyName = stringOrNull(record.companyName) ?? undefined;
   const salary = normalizeSalary(record.salary);
@@ -153,6 +221,7 @@ function normalizeOpportunity(value: unknown): OpportunityItem | null {
   return {
     id,
     title,
+    description,
     excerpt,
     issueState: record.issueState === "closed" ? "closed" : "open",
     repository,
@@ -177,17 +246,55 @@ function normalizeOpportunity(value: unknown): OpportunityItem | null {
   };
 }
 
-function filterItems(items: OpportunityItem[], searchParams: URLSearchParams) {
-  const repositoryFilter = searchParams.get("repository");
-  const regionFilter = searchParams.get("region");
-  const countryFilter = searchParams.get("country");
+function countBy<T>(items: T[], getValue: (item: T) => string) {
+  return items.reduce<Record<string, number>>((accumulator, item) => {
+    const value = getValue(item);
+    if (!value) return accumulator;
+    accumulator[value] = (accumulator[value] ?? 0) + 1;
+    return accumulator;
+  }, {});
+}
 
+function filterItems(
+  items: OpportunityItem[],
+  scopeFilters: ScopeFilters,
+  ignoredKeys: ScopeFilterKey[] = [],
+) {
   return items.filter((item) => {
-    const matchesRepository = !repositoryFilter || repositoryFilter === "all" || item.repository === repositoryFilter;
-    const matchesRegion = !regionFilter || regionFilter === "all" || item.region === regionFilter;
-    const matchesCountry = !countryFilter || countryFilter === "all" || item.country === countryFilter;
-    return matchesRepository && matchesRegion && matchesCountry;
+    const matchesRepository = ignoredKeys.includes("repository") ||
+      !scopeFilters.repository ||
+      item.repository === scopeFilters.repository;
+    const matchesRegion = ignoredKeys.includes("region") ||
+      !scopeFilters.region ||
+      item.region === scopeFilters.region;
+    const matchesCountry = ignoredKeys.includes("country") ||
+      !scopeFilters.country ||
+      item.country === scopeFilters.country;
+    const matchesOpenIssue = item.issueState === "open";
+
+    return matchesOpenIssue && matchesRepository && matchesRegion && matchesCountry;
   });
+}
+
+function buildFacets(params: {
+  filteredItems: OpportunityItem[];
+  repositoryFacetItems: OpportunityItem[];
+  regionFacetItems: OpportunityItem[];
+  countryFacetItems: OpportunityItem[];
+}): OpportunityFilterFacets {
+  const authorLabels = params.filteredItems.reduce<Record<string, string>>((accumulator, item) => {
+    accumulator[item.author.handle] = item.author.name;
+    return accumulator;
+  }, {});
+
+  return {
+    repositories: countBy(params.repositoryFacetItems, (item) => item.repository),
+    regions: countBy(params.regionFacetItems, (item) => item.region),
+    countries: countBy(params.countryFacetItems, (item) => item.country),
+    tags: countBy(params.filteredItems.flatMap((item) => item.tags), (tag) => tag),
+    authors: countBy(params.filteredItems, (item) => item.author.handle),
+    authorLabels,
+  };
 }
 
 function sortItems(items: OpportunityItem[], sortOrder: SortOrder) {
@@ -198,7 +305,12 @@ function sortItems(items: OpportunityItem[], sortOrder: SortOrder) {
   });
 }
 
-function paginateItems(items: OpportunityItem[], offset: number, limit: number): OpportunitiesApiPayload {
+function paginateItems(
+  items: OpportunityItem[],
+  offset: number,
+  limit: number,
+  meta: OpportunitiesApiPayload["meta"],
+): OpportunitiesApiPayload {
   const start = clamp(offset, 0, items.length);
   const slice = items.slice(start, start + limit);
   const nextOffset = start + slice.length;
@@ -209,23 +321,39 @@ function paginateItems(items: OpportunityItem[], offset: number, limit: number):
     hasMore: nextOffset < items.length,
     rateLimited: false,
     retryAfterSeconds: null,
+    meta,
   };
 }
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const snapshotItems = await loadSnapshotItems();
-    const normalizedItems = snapshotItems
+    const scopeFilters = parseScopeFilters(searchParams);
+    const snapshot = await loadSnapshotDataset();
+    const normalizedItems = snapshot.items
       .map((item) => normalizeOpportunity(item))
       .filter((item): item is OpportunityItem => item !== null);
 
-    const filteredItems = filterItems(normalizedItems, searchParams);
+    const filteredItems = filterItems(normalizedItems, scopeFilters);
+    const facets = buildFacets({
+      filteredItems,
+      repositoryFacetItems: filterItems(normalizedItems, scopeFilters, ["repository"]),
+      regionFacetItems: filterItems(normalizedItems, scopeFilters, ["region"]),
+      countryFacetItems: filterItems(normalizedItems, scopeFilters, ["country"]),
+    });
     const sortedItems = sortItems(filteredItems, normalizeSortOrder(searchParams.get("sort")));
     const payload = paginateItems(
       sortedItems,
       parseOffset(searchParams.get("cursor")),
       parseLimit(searchParams.get("limit")),
+      {
+        snapshotGeneratedAt: snapshot.generatedAt,
+        deployedAt: API_DEPLOYED_AT,
+        lastUpdatedAt: pickLastUpdatedAt(snapshot.generatedAt, API_DEPLOYED_AT),
+        totalCount: normalizedItems.length,
+        filteredCount: filteredItems.length,
+        facets,
+      },
     );
 
     return NextResponse.json(payload satisfies OpportunitiesApiPayload);
@@ -233,7 +361,21 @@ export async function GET(request: NextRequest) {
     console.error(error);
 
     return NextResponse.json(
-      { items: [], nextCursor: null, hasMore: false, rateLimited: false, retryAfterSeconds: null } satisfies OpportunitiesApiPayload,
+      {
+        items: [],
+        nextCursor: null,
+        hasMore: false,
+        rateLimited: false,
+        retryAfterSeconds: null,
+        meta: {
+          snapshotGeneratedAt: null,
+          deployedAt: API_DEPLOYED_AT,
+          lastUpdatedAt: API_DEPLOYED_AT,
+          totalCount: 0,
+          filteredCount: 0,
+          facets: EMPTY_FACETS,
+        },
+      } satisfies OpportunitiesApiPayload,
       { status: 502 },
     );
   }

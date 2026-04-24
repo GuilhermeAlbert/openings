@@ -28,6 +28,8 @@ export function OpportunitiesList({
   onSelectOpportunity,
   onCommunitySelect,
   onAuthorSelect,
+  hideCommunityIdentity,
+  hideAuthorIdentity,
 }: OpportunitiesListProps) {
   const { locale, messages } = useI18n();
   const listMessages = messages.opportunities.list;
@@ -36,13 +38,23 @@ export function OpportunitiesList({
   React.useEffect(() => {
     const target = sentinelRef.current;
     if (!target || !hasMore || isLoading || isFetchingMore) return;
+    let cancelled = false;
+
     const observer = new IntersectionObserver(
-      ([entry]) => entry?.isIntersecting && onLoadMore(),
+      ([entry]) => {
+        if (!entry?.isIntersecting || cancelled) return;
+        observer.unobserve(target);
+        void onLoadMore();
+      },
       { rootMargin: "360px 0px" },
     );
+
     observer.observe(target);
-    return () => observer.disconnect();
-  }, [hasMore, isFetchingMore, isLoading, items.length, onLoadMore]);
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+    };
+  }, [hasMore, isFetchingMore, isLoading, onLoadMore]);
 
   return (
     <section className={cn(panelStyles(), "space-y-4")}>
@@ -72,6 +84,8 @@ export function OpportunitiesList({
           onSelectOpportunity={onSelectOpportunity}
           onCommunitySelect={onCommunitySelect}
           onAuthorSelect={onAuthorSelect}
+          hideCommunityIdentity={hideCommunityIdentity}
+          hideAuthorIdentity={hideAuthorIdentity}
         />
       )}
 

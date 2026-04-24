@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { OpportunitiesPage } from "@/app/opportunities/_components/opportunities-page";
 import { listSnapshotRepositories } from "@/lib/opportunities/snapshot";
 import { repositoryFromCommunitySegments } from "@/lib/opportunities/routing";
+import { getSnapshotCommunityByRepository } from "@/lib/opportunities/communities";
 
 interface CommunityRepositoryPageProps {
   params: Promise<{
@@ -39,5 +40,22 @@ export default async function CommunityRepositoryPage({
     notFound();
   }
 
-  return <OpportunitiesPage forcedRepository={repository} />;
+  const communitySummary = await getSnapshotCommunityByRepository(repository);
+
+  return (
+    <OpportunitiesPage
+      forcedRepository={repository}
+      forcedRepositoryProfile={
+        communitySummary ?? {
+          repository,
+          name: repository.split("/")[0] ?? repository,
+          avatarUrl: "",
+          region: "Unknown",
+          country: "Unknown",
+          opportunitiesCount: 0,
+          lastPostedAt: null,
+        }
+      }
+    />
+  );
 }

@@ -8,7 +8,7 @@ export const LOAD_MORE_BATCH_SIZE = 40;
 export const DEFAULT_FILTERS: OpportunityFiltersState = {
   repository: "all",
   region: "all",
-  country: "all",
+  country: "Brazil",
   tags: [],
   authors: [],
   searchText: "",

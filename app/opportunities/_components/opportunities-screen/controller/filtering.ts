@@ -1,4 +1,5 @@
 import type { OpportunityFiltersState, OpportunityItem } from "@/app/opportunities/_components/opportunities-screen/types";
+import { canonicalTagValue } from "./tag-normalization";
 
 export function matchesSearch(opportunity: OpportunityItem, searchText: string) {
   if (!searchText.trim()) return true;
@@ -6,6 +7,7 @@ export function matchesSearch(opportunity: OpportunityItem, searchText: string) 
   const searchableText = [
     opportunity.title,
     opportunity.excerpt,
+    opportunity.description,
     opportunity.repository,
     opportunity.country,
     opportunity.region,
@@ -24,6 +26,10 @@ export function getFilteredOpportunities(
   opportunities: OpportunityItem[],
   filters: OpportunityFiltersState,
 ) {
+  const selectedTagKeys = filters.tags.length > 0
+    ? new Set(filters.tags.map((tag) => canonicalTagValue(tag)).filter(Boolean))
+    : null;
+
   return opportunities
     .filter((opportunity) => {
       if (opportunity.issueState !== "open") return false;
@@ -32,8 +38,8 @@ export function getFilteredOpportunities(
       const matchesRegion = filters.region === "all" || opportunity.region === filters.region;
       const matchesCountry = filters.country === "all" || opportunity.country === filters.country;
       const matchesTags =
-        filters.tags.length === 0 ||
-        filters.tags.some((tag) => opportunity.tags.includes(tag));
+        !selectedTagKeys ||
+        opportunity.tags.some((tag) => selectedTagKeys.has(canonicalTagValue(tag)));
       const matchesAuthors =
         filters.authors.length === 0 || filters.authors.includes(opportunity.author.handle);
       return (

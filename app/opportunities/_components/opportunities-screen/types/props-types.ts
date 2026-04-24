@@ -1,6 +1,8 @@
 import type {
+  CommunityProfileSummary,
   OpportunityItem,
   OpportunitySortOrder,
+  UserProfileSummary,
   OpportunityViewMode,
 } from "./domain-types";
 import type {
@@ -50,6 +52,8 @@ export interface OpportunitiesListProps {
   onSelectOpportunity: (item: OpportunityItem) => void;
   onCommunitySelect: (repository: string) => void;
   onAuthorSelect: (authorHandle: string) => void;
+  hideCommunityIdentity: boolean;
+  hideAuthorIdentity: boolean;
 }
 
 export interface OpportunityCardProps {
@@ -59,6 +63,8 @@ export interface OpportunityCardProps {
   onSelectOpportunity: (item: OpportunityItem) => void;
   onCommunitySelect: (repository: string) => void;
   onAuthorSelect: (authorHandle: string) => void;
+  hideCommunityIdentity: boolean;
+  hideAuthorIdentity: boolean;
 }
 
 export interface ViewModeToggleProps {
@@ -69,6 +75,8 @@ export interface ViewModeToggleProps {
 export interface OpportunitiesScreenProps {
   forcedRepository?: string;
   forcedAuthor?: string;
+  forcedAuthorProfile?: UserProfileSummary | null;
+  forcedRepositoryProfile?: CommunityProfileSummary | null;
 }
 
 export interface OpportunityDrawerProps {
