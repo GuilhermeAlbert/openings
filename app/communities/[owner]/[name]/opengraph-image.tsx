@@ -8,6 +8,7 @@ import { createCommunitySocialCard } from "@/lib/metadata/social-card-presentati
 import { listCommunitySocialCardParams } from "@/lib/metadata/social-card-static-params";
 import { getSnapshotCommunityByRepository } from "@/lib/opportunities/communities";
 import { repositoryFromCommunitySegments } from "@/lib/opportunities/routing";
+import { selectStaticEntityParams } from "@/lib/runtime/cloudflare-build";
 
 interface CommunitySocialImageProps {
   params: Promise<{ owner: string; name: string }>;
@@ -23,7 +24,7 @@ const getCommunity = cache(getSnapshotCommunityByRepository);
 export async function generateStaticParams(): Promise<
   Array<{ owner: string; name: string }>
 > {
-  return listCommunitySocialCardParams();
+  return selectStaticEntityParams(await listCommunitySocialCardParams());
 }
 
 async function resolveCommunity(params: CommunitySocialImageProps["params"]) {
