@@ -3,7 +3,7 @@ import { access, mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promise
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { prepareCloudflarePagesExport } from "./cloudflare-pages-export.mjs";
+import { pagesWorkerSource, prepareCloudflarePagesExport } from "./cloudflare-pages-export.mjs";
 
 const root = await mkdtemp(join(tmpdir(), "openings-pages-export-"));
 const source = join(root, "out");
@@ -43,7 +43,8 @@ try {
   assert.match(worker, /publishing-platform-staging\.business-850\.workers\.dev/u);
   assert.match(worker, /\/web\/openings/u);
   assert.match(worker, /env\.ASSETS\.fetch/u);
-  assert.match(worker, /response\.status !== 404/u);
+  assert.match(worker, /response\.ok/u);
+  assert.match(worker, /catch/u);
   assert.equal(await readFile(join(target, "route-indexes", "authors", "index.html"), "utf8"), "authors");
   assert.equal(await readFile(join(target, "route-indexes", "users", "index.html"), "utf8"), "users");
   assert.equal(await readFile(join(target, "route-indexes", "communities", "index.html"), "utf8"), "communities");
@@ -53,6 +54,20 @@ try {
   await assert.rejects(access(join(target, "users", "alice", "index.html")));
   await assert.rejects(access(join(target, "communities", "acme", "jobs", "index.html")));
   await assert.rejects(access(join(target, "community", "acme", "jobs", "index.html")));
+
+  const generatedWorker = (await import(`data:text/javascript,${encodeURIComponent(pagesWorkerSource())}`)).default;
+  const originalFetch = globalThis.fetch;
+  const assets = { fetch: async () => new Response("static-shell") };
+  try {
+    globalThis.fetch = async () => new Response("platform-entity");
+    assert.equal(await (await generatedWorker.fetch(new Request("https://preview.test/jobs/job-123"), { ASSETS: assets })).text(), "platform-entity");
+    globalThis.fetch = async () => new Response("unavailable", { status: 503 });
+    assert.equal(await (await generatedWorker.fetch(new Request("https://preview.test/jobs/job-123"), { ASSETS: assets })).text(), "static-shell");
+    globalThis.fetch = async () => { throw new Error("network unavailable"); };
+    assert.equal(await (await generatedWorker.fetch(new Request("https://preview.test/communities/acme/jobs"), { ASSETS: assets })).text(), "static-shell");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 } finally {
   await rm(root, { recursive: true, force: true });
 }

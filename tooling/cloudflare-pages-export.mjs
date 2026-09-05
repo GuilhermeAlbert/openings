@@ -71,7 +71,7 @@ export async function prepareCloudflarePagesExport({
   return { fileCount: files.length, totalBytes };
 }
 
-function pagesWorkerSource() {
+export function pagesWorkerSource() {
   return `const PLATFORM_ORIGIN = "https://publishing-platform-staging.business-850.workers.dev";
 const ENTITY_ROUTE = /^\\/(?:jobs\\/[^/]+|(?:authors|users)\\/[^/]+|(?:communities|community)\\/[^/]+\\/[^/]+)\\/?$/u;
 
@@ -80,8 +80,12 @@ export default {
     const url = new URL(request.url);
     if (ENTITY_ROUTE.test(url.pathname)) {
       const target = new URL(\`/web/openings\${url.pathname}\`, PLATFORM_ORIGIN);
-      const response = await fetch(new Request(target, request));
-      if (response.status !== 404) return response;
+      try {
+        const response = await fetch(new Request(target, request));
+        if (response.ok) return response;
+      } catch {
+        // The static client shell remains the availability fallback.
+      }
     }
     return env.ASSETS.fetch(request);
   },

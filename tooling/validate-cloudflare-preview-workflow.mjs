@@ -8,10 +8,7 @@ const workflow = await readFile(
 
 assert.match(workflow, /^name: Deploy Cloudflare Preview$/mu);
 assert.match(workflow, /^\s{2}workflow_dispatch:$/mu);
-assert.match(
-  workflow,
-  /^\s{2}push:\s*\n\s{4}branches:\s*\[cloudflare-preview\]$/mu,
-);
+assert.doesNotMatch(workflow, /^\s{2}push:/mu);
 assert.match(workflow, /permissions:\s*\n\s{2}contents: read/u);
 assert.match(workflow, /group: cloudflare-preview-\$\{\{ github\.ref \}\}/u);
 assert.match(workflow, /cancel-in-progress: true/u);

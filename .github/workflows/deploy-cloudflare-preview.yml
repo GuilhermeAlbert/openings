@@ -2,8 +2,6 @@ name: Deploy Cloudflare Preview
 
 on:
   workflow_dispatch:
-  push:
-    branches: [cloudflare-preview]
 
 permissions:
   contents: read
