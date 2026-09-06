@@ -174,6 +174,7 @@ assert.match(curatedPageSource, /listStaticOpportunities/u);
 assert.match(curatedPageSource, /slice\(0, 20\)/u);
 assert.match(curatedPageSource, /localizedAlternates/u);
 assert.match(curatedPageSource, /localizedOpenGraphLocales/u);
+assert.match(curatedPageSource, /localizedEntryPath\("\/opportunities", page\.locale\)/u);
 assert.match(curatedPageSource, /alternateLocale/u);
 assert.match(curatedPageSource, /application\/atom\+xml/u);
 assert.match(sitemapSource, /alternates:\s*\{\s*languages/u);
@@ -202,7 +203,15 @@ assert.match(localizedRoutesSource, /localizedEquivalentPath/u);
 assert.match(localizedRoutesSource, /\/discover\//u);
 assert.match(alternatesSource, /localizedPublicAlternates/u);
 assert.match(headerSource, /localizedEquivalentPath/u);
+assert.match(headerSource, /localizedEntryPath\("\/", activeLocale\)/u);
 assert.match(headerSource, /router\.push/u);
+const deferredHomeSource = await readFile(
+  "app/_components/deferred-home-opportunities/index.tsx",
+  "utf8",
+);
+assert.match(deferredHomeSource, /localizedEntryPath\("\/opportunities", locale\)/u);
+const footerSource = await readFile("components/footer/index.tsx", "utf8");
+assert.match(footerSource, /localizedEntryPath\("\/", locale\)/u);
 
 const [providerSource, localizedHomeSource, localizedOpportunitiesSource] = await Promise.all([
   readFile("components/providers/i18n-provider/index.tsx", "utf8"),

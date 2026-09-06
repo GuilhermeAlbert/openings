@@ -13,6 +13,7 @@ import {
 } from "@/lib/metadata/localized-alternates";
 import { resolveCanonicalUrl } from "@/lib/metadata/site-metadata";
 import { buildOpportunityPath } from "@/lib/opportunities/routing";
+import { localizedEntryPath } from "@/lib/navigation/localized-routes";
 import { listStaticOpportunities } from "@/lib/opportunities/static-api";
 import { LocaleRouteSync } from "@/app/_components/locale-route-sync";
 
@@ -81,7 +82,7 @@ export default async function CuratedDiscoveryPage({ params }: CuratedPageProps)
         <p className="mt-4 text-lg leading-8 text-muted-foreground">{page.content.description}</p>
         <p className="mt-4 max-w-3xl text-sm leading-6 text-muted-foreground">{page.content.explanation}</p>
         <div className="mt-6 flex flex-wrap gap-4">
-          <Link href={`/?${query}`} className="inline-flex min-h-11 items-center rounded-pill bg-primary px-5 text-sm font-semibold text-primary-foreground hover:bg-primary-hover">{page.content.cta}</Link>
+          <Link href={`${localizedEntryPath("/opportunities", page.locale)}?${query}`} className="inline-flex min-h-11 items-center rounded-pill bg-primary px-5 text-sm font-semibold text-primary-foreground hover:bg-primary-hover">{page.content.cta}</Link>
           <a href={`/feeds/${page.preset.feedSlug}.xml`} type="application/atom+xml" className="inline-flex min-h-11 items-center text-sm font-semibold text-primary-deep underline-offset-4 hover:underline">Atom feed</a>
         </div>
       </header>

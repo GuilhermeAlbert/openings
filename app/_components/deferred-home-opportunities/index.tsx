@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useI18n } from "@/components/providers/i18n-provider/use-i18n";
+import { localizedEntryPath } from "@/lib/navigation/localized-routes";
 
 type OpportunitiesScreenComponent = typeof import(
   "@/app/opportunities/_components/opportunities-screen"
 )["OpportunitiesScreen"];
 
 export function DeferredHomeOpportunities(): React.ReactNode {
-  const { messages } = useI18n();
+  const { locale, messages } = useI18n();
   const regionRef = useRef<HTMLElement>(null);
   const [Screen, setScreen] = useState<OpportunitiesScreenComponent | null>(null);
 
@@ -69,7 +70,7 @@ export function DeferredHomeOpportunities(): React.ReactNode {
               {messages.opportunities.header.description}
             </p>
             <Link
-              href="/opportunities"
+              href={localizedEntryPath("/opportunities", locale)}
               className="mt-5 inline-flex min-h-11 items-center rounded-pill bg-primary px-5 text-sm font-semibold text-primary-foreground hover:bg-primary-hover"
             >
               {messages.home.primaryAction}

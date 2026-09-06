@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { AVAILABLE_LOCALES } from "@/lib/constants/locales";
 import { EXTERNAL_ROUTES, PUBLIC_ROUTES } from "@/lib/navigation/routes";
 import {
+  localizedEntryPath,
   localizedEquivalentPath,
   localizedLocaleFromPath,
 } from "@/lib/navigation/localized-routes";
@@ -36,9 +37,10 @@ export function Header({
   const { locale: currentLocale, messages, setLocale } = useI18n();
   const routeLocale = localizedLocaleFromPath(pathname);
   const activeLocale = locale ?? routeLocale ?? currentLocale;
+  const localizedHomePath = localizedEntryPath("/", activeLocale);
   const availableLocales = locales?.length ? locales : AVAILABLE_LOCALES;
   const primaryNavItems = [
-    { label: messages.header.nav.discover, href: PUBLIC_ROUTES.home },
+    { label: messages.header.nav.discover, href: localizedHomePath },
     { label: messages.header.nav.communities, href: PUBLIC_ROUTES.communities },
     { label: messages.header.nav.authors, href: PUBLIC_ROUTES.authors },
     { label: messages.header.nav.docs, href: PUBLIC_ROUTES.docs },
@@ -117,7 +119,10 @@ export function Header({
   return (
     <header className={cn(headerStyles({ position }), className)}>
       <div className="mx-auto grid h-18 w-full max-w-[90rem] grid-cols-[auto_1fr_auto] items-center gap-3 px-4 sm:px-6 lg:px-8 xl:px-10">
-        <BrandLogo href={logoHref} brandName={messages.header.brandName} />
+        <BrandLogo
+          href={logoHref === "/" ? localizedHomePath : logoHref}
+          brandName={messages.header.brandName}
+        />
         <HeaderNav
           items={primaryNavItems}
           ariaLabel={messages.header.primaryNavigationAriaLabel}
