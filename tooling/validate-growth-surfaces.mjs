@@ -178,6 +178,16 @@ assert.match(curatedPageSource, /alternateLocale/u);
 assert.match(curatedPageSource, /application\/atom\+xml/u);
 assert.match(sitemapSource, /alternates:\s*\{\s*languages/u);
 assert.match(sitemapSource, /localizedAlternates/u);
+assert.match(sitemapSource, /LOCALIZED_ENTRY_LOCALES/u);
+assert.match(sitemapSource, /localizedPublicAlternates/u);
+const [defaultHomeSource, defaultOpportunitiesSource] = await Promise.all([
+  readFile("app/page.tsx", "utf8"),
+  readFile("app/opportunities/page.tsx", "utf8"),
+]);
+for (const source of [defaultHomeSource, defaultOpportunitiesSource]) {
+  assert.match(source, /localizedPublicAlternates/u);
+  assert.match(source, /LocaleCode\.English/u);
+}
 assert.match(localeSyncSource, /setStoredLocale/u);
 assert.doesNotMatch(localeSyncSource, /redirect|geolocation/iu);
 assert.match(shortcutsSource, /\/discover\//u);

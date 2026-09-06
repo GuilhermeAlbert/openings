@@ -1,11 +1,18 @@
 import type { MetadataRoute } from "next";
-import { AVAILABLE_LOCALES } from "@/lib/constants/locales";
+import { AVAILABLE_LOCALES, LocaleCode } from "@/lib/constants/locales";
 import {
   CURATED_DISCOVERY_PRESETS,
   matchesCuratedPreset,
 } from "@/lib/discovery/curated-pages";
 import { resolveCanonicalUrl } from "@/lib/metadata/site-metadata";
-import { localizedAlternates } from "@/lib/metadata/localized-alternates";
+import {
+  localizedAlternates,
+  localizedPublicAlternates,
+} from "@/lib/metadata/localized-alternates";
+import {
+  LOCALIZED_ENTRY_LOCALES,
+  localizedEntryPath,
+} from "@/lib/navigation/localized-routes";
 import { listSnapshotCommunities } from "@/lib/opportunities/communities";
 import { buildCommunityPath, buildOpportunityPath, buildUserPath } from "@/lib/opportunities/routing";
 import {
@@ -49,8 +56,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
   const staticPages = [
-    entry("/", generatedAt, "daily", 1),
-    entry("/opportunities", generatedAt, "daily", 0.9),
+    entry("/", generatedAt, "daily", 1, localizedPublicAlternates(LocaleCode.English, "/").languages),
+    entry("/opportunities", generatedAt, "daily", 0.9, localizedPublicAlternates(LocaleCode.English, "/opportunities").languages),
     entry("/communities", generatedAt, "daily", 0.8),
     entry("/authors", generatedAt, "daily", 0.7),
     entry("/status", generatedAt, "daily", 0.7),
@@ -60,6 +67,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entry("/privacy", RELEASE_DATE, "monthly", 0.3),
     entry("/terms", RELEASE_DATE, "monthly", 0.3),
   ];
+  const localizedStaticPages = LOCALIZED_ENTRY_LOCALES.flatMap((locale) => [
+    entry(
+      localizedEntryPath("/", locale),
+      generatedAt,
+      "daily",
+      0.9,
+      localizedPublicAlternates(locale, "/").languages,
+    ),
+    entry(
+      localizedEntryPath("/opportunities", locale),
+      generatedAt,
+      "daily",
+      0.8,
+      localizedPublicAlternates(locale, "/opportunities").languages,
+    ),
+  ]);
   const communityPages = communities.map((community) =>
     entry(buildCommunityPath(community.repository), community.lastPostedAt ?? generatedAt, "daily", 0.6));
   const authorPages = [...authors].map(([handle, updatedAt]) =>
@@ -84,6 +107,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
   const reportPages = reports.reports.map((report) =>
     entry(`/reports/${report.period}`, report.generatedAt, "monthly", 0.6));
-  const all = [...staticPages, ...reportPages, ...communityPages, ...authorPages, ...jobPages, ...curatedPages];
+  const all = [...staticPages, ...localizedStaticPages, ...reportPages, ...communityPages, ...authorPages, ...jobPages, ...curatedPages];
   return [...new Map(all.map((item) => [item.url, item])).values()];
 }
