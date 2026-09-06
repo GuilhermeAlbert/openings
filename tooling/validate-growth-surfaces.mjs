@@ -200,6 +200,15 @@ for (const source of [localizedHomeSource, localizedOpportunitiesSource]) {
   assert.match(source, /<LocaleRouteSync locale=\{page\.locale\}/u);
 }
 
+const [packageSource, exportLocaleSource] = await Promise.all([
+  readFile("package.json", "utf8"),
+  readFile("tooling/localize-exported-html.mjs", "utf8"),
+]);
+assert.match(packageSource, /next build && node tooling\/localize-exported-html\.mjs/u);
+assert.match(exportLocaleSource, /AVAILABLE_EXPORTED_LOCALES/u);
+assert.match(exportLocaleSource, /<html lang=/u);
+assert.match(exportLocaleSource, /readdir/u);
+
 const similarSource = await readFile("lib/opportunities/similar.ts", "utf8");
 const similar = await import(dataModule(similarSource));
 const currentJob = {

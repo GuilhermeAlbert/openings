@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node tooling/validate-home-performance.mjs --exported && node tooling/publish-social-images.mjs",
+    "build": "next build && node tooling/localize-exported-html.mjs && node tooling/validate-home-performance.mjs --exported && node tooling/publish-social-images.mjs",
     "start": "next start",
     "lint": "eslint",
     "test": "node tooling/run-validations.mjs",
