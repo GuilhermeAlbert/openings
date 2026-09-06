@@ -40,6 +40,27 @@ async function assertRouteSpecificSocialImage() {
 async function main() {
   const html = await readFile(path.join(OUTPUT_DIRECTORY, "index.html"), "utf8");
 
+  assert.match(
+    html,
+    /<title>openings\.dev — Find tech jobs shared by GitHub communities<\/title>/u,
+  );
+  assert.match(html, /<script type="application\/ld\+json">[^<]*"@type":"WebSite"/u);
+  assert.match(html, /<script type="application\/ld\+json">[^<]*"@type":"Organization"/u);
+
+  const [designHtml, compareHtml, localizedHtml, sitemapXml] = await Promise.all([
+    readFile(path.join(OUTPUT_DIRECTORY, "design", "index.html"), "utf8"),
+    readFile(path.join(OUTPUT_DIRECTORY, "compare", "index.html"), "utf8"),
+    readFile(path.join(OUTPUT_DIRECTORY, "en", "discover", "remote", "index.html"), "utf8"),
+    readFile(path.join(OUTPUT_DIRECTORY, "sitemap.xml"), "utf8"),
+  ]);
+  for (const utilityHtml of [designHtml, compareHtml]) {
+    assert.match(utilityHtml, /<meta name="robots" content="noindex, follow"\/>/u);
+  }
+  assert.match(localizedHtml, /<meta property="og:locale" content="en_US"\/>/u);
+  assert.match(localizedHtml, /<meta property="og:locale:alternate" content="pt_BR"\/>/u);
+  assert.match(sitemapXml, /hreflang="x-default"/u);
+  assert.match(sitemapXml, /hreflang="pt"/u);
+
   assert.match(html, /<link rel="icon" href="\/brand-mark-light\.svg"/u);
   assert.match(html, /<link rel="icon" href="\/brand-mark-dark\.svg"/u);
   assert.match(html, /<link rel="apple-touch-icon" href="\/apple-touch-icon\.png"/u);
