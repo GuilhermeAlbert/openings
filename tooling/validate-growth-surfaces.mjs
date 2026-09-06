@@ -138,7 +138,7 @@ assert.match(layoutSource, /"application\/atom\+xml"/u);
 
 const curatedSource = await readFile("lib/discovery/curated-pages.ts", "utf8");
 const curated = await import(dataModule(curatedSource));
-assert.equal(curated.CURATED_DISCOVERY_PRESETS.length, 6);
+assert.equal(curated.CURATED_DISCOVERY_PRESETS.length, 10);
 for (const preset of curated.CURATED_DISCOVERY_PRESETS) {
   assert.equal(Object.keys(preset.copy).sort().join(","), "de,en,es,fr,it,pt");
   for (const content of Object.values(preset.copy)) {
@@ -147,6 +147,15 @@ for (const preset of curated.CURATED_DISCOVERY_PRESETS) {
     }
   }
   assert.equal(preset.feedSlug, preset.slug);
+}
+for (const [slug, area] of [
+  ["backend", "backend"],
+  ["frontend", "frontend"],
+  ["mobile", "mobile"],
+  ["full-stack", "fullstack"],
+]) {
+  const preset = curated.CURATED_DISCOVERY_PRESETS.find((entry) => entry.slug === slug);
+  assert.equal(preset?.query.areas, area);
 }
 const [alternatesSource, curatedPageSource, localeSyncSource, shortcutsSource] = await Promise.all([
   readFile("lib/metadata/localized-alternates.ts", "utf8"),
