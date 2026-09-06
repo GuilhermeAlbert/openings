@@ -14,7 +14,7 @@ import {
 import { resolveCanonicalUrl } from "@/lib/metadata/site-metadata";
 import { buildOpportunityPath } from "@/lib/opportunities/routing";
 import { listStaticOpportunities } from "@/lib/opportunities/static-api";
-import { LocaleRouteSync } from "./_components/locale-route-sync";
+import { LocaleRouteSync } from "@/app/_components/locale-route-sync";
 
 interface CuratedPageProps {
   params: Promise<{ locale: string; slug: string }>;

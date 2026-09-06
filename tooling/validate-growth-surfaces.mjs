@@ -151,7 +151,7 @@ for (const preset of curated.CURATED_DISCOVERY_PRESETS) {
 const [alternatesSource, curatedPageSource, localeSyncSource, shortcutsSource] = await Promise.all([
   readFile("lib/metadata/localized-alternates.ts", "utf8"),
   readFile("app/[locale]/discover/[slug]/page.tsx", "utf8"),
-  readFile("app/[locale]/discover/[slug]/_components/locale-route-sync.tsx", "utf8"),
+  readFile("app/_components/locale-route-sync/index.tsx", "utf8"),
   readFile("app/opportunities/_components/opportunities-screen/opportunities-quick-filters/discovery-shortcuts/index.tsx", "utf8"),
 ]);
 assert.match(alternatesSource, /"x-default"/u);
@@ -184,6 +184,21 @@ assert.match(localizedRoutesSource, /\/discover\//u);
 assert.match(alternatesSource, /localizedPublicAlternates/u);
 assert.match(headerSource, /localizedEquivalentPath/u);
 assert.match(headerSource, /router\.push/u);
+
+const [providerSource, localizedHomeSource, localizedOpportunitiesSource] = await Promise.all([
+  readFile("components/providers/i18n-provider/index.tsx", "utf8"),
+  readFile("app/[locale]/page.tsx", "utf8"),
+  readFile("app/[locale]/opportunities/page.tsx", "utf8"),
+]);
+assert.match(providerSource, /initialLocale/u);
+for (const source of [localizedHomeSource, localizedOpportunitiesSource]) {
+  assert.match(source, /LOCALIZED_ENTRY_LOCALES/u);
+  assert.match(source, /dynamicParams\s*=\s*false/u);
+  assert.match(source, /localizedPublicAlternates/u);
+  assert.match(source, /localizedOpenGraphLocales/u);
+  assert.match(source, /<I18nProvider initialLocale=\{page\.locale\}>/u);
+  assert.match(source, /<LocaleRouteSync locale=\{page\.locale\}/u);
+}
 
 const similarSource = await readFile("lib/opportunities/similar.ts", "utf8");
 const similar = await import(dataModule(similarSource));
