@@ -7,7 +7,10 @@ import {
   curatedPresetBySlug,
   matchesCuratedPreset,
 } from "@/lib/discovery/curated-pages";
-import { localizedAlternates } from "@/lib/metadata/localized-alternates";
+import {
+  localizedAlternates,
+  localizedOpenGraphLocales,
+} from "@/lib/metadata/localized-alternates";
 import { resolveCanonicalUrl } from "@/lib/metadata/site-metadata";
 import { buildOpportunityPath } from "@/lib/opportunities/routing";
 import { listStaticOpportunities } from "@/lib/opportunities/static-api";
@@ -35,6 +38,7 @@ export async function generateMetadata({ params }: CuratedPageProps): Promise<Me
   const page = resolvePage(locale, slug);
   if (!page) return {};
   const path = `/discover/${page.preset.slug}`;
+  const openGraphLocales = localizedOpenGraphLocales(page.locale);
   return {
     title: page.content.title,
     description: page.content.description,
@@ -53,6 +57,8 @@ export async function generateMetadata({ params }: CuratedPageProps): Promise<Me
       url: resolveCanonicalUrl(`/${page.locale}${path}`),
       siteName: "openings.dev",
       type: "website",
+      locale: openGraphLocales.locale,
+      alternateLocale: openGraphLocales.alternateLocales,
     },
   };
 }

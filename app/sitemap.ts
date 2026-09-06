@@ -5,6 +5,7 @@ import {
   matchesCuratedPreset,
 } from "@/lib/discovery/curated-pages";
 import { resolveCanonicalUrl } from "@/lib/metadata/site-metadata";
+import { localizedAlternates } from "@/lib/metadata/localized-alternates";
 import { listSnapshotCommunities } from "@/lib/opportunities/communities";
 import { buildCommunityPath, buildOpportunityPath, buildUserPath } from "@/lib/opportunities/routing";
 import {
@@ -22,8 +23,15 @@ function entry(
   lastModified: string,
   changeFrequency: "daily" | "weekly" | "monthly",
   priority: number,
+  languages?: Record<string, string>,
 ): MetadataRoute.Sitemap[number] {
-  return { url: resolveCanonicalUrl(path), lastModified, changeFrequency, priority };
+  return {
+    url: resolveCanonicalUrl(path),
+    lastModified,
+    changeFrequency,
+    priority,
+    ...(languages ? { alternates: { languages } } : {}),
+  };
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -65,7 +73,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         !latest || Date.parse(item.updatedAt) > Date.parse(latest)
           ? item.updatedAt
           : latest, null) ?? generatedAt;
-      return entry(`/${code}/discover/${preset.slug}`, lastModified, "daily", 0.7);
+      const path = `/discover/${preset.slug}`;
+      return entry(
+        `/${code}${path}`,
+        lastModified,
+        "daily",
+        0.7,
+        localizedAlternates(code, path).languages,
+      );
     }));
   const reportPages = reports.reports.map((report) =>
     entry(`/reports/${report.period}`, report.generatedAt, "monthly", 0.6));

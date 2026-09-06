@@ -156,11 +156,19 @@ const [alternatesSource, curatedPageSource, localeSyncSource, shortcutsSource] =
 ]);
 assert.match(alternatesSource, /"x-default"/u);
 assert.match(alternatesSource, /AVAILABLE_LOCALES/u);
+for (const openGraphLocale of ["en_US", "pt_BR", "es_ES", "it_IT", "fr_FR", "de_DE"]) {
+  assert.match(alternatesSource, new RegExp(`\\b${openGraphLocale}\\b`, "u"));
+}
+assert.match(alternatesSource, /localizedOpenGraphLocales/u);
 assert.match(curatedPageSource, /generateStaticParams/u);
 assert.match(curatedPageSource, /listStaticOpportunities/u);
 assert.match(curatedPageSource, /slice\(0, 20\)/u);
 assert.match(curatedPageSource, /localizedAlternates/u);
+assert.match(curatedPageSource, /localizedOpenGraphLocales/u);
+assert.match(curatedPageSource, /alternateLocale/u);
 assert.match(curatedPageSource, /application\/atom\+xml/u);
+assert.match(sitemapSource, /alternates:\s*\{\s*languages/u);
+assert.match(sitemapSource, /localizedAlternates/u);
 assert.match(localeSyncSource, /setStoredLocale/u);
 assert.doesNotMatch(localeSyncSource, /redirect|geolocation/iu);
 assert.match(shortcutsSource, /\/discover\//u);
