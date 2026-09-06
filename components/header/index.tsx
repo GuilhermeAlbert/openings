@@ -2,10 +2,15 @@
 
 import * as React from "react";
 import { ExternalLink, Star } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { useI18n } from "@/components/providers/i18n-provider/use-i18n";
 import { Button } from "@/components/ui/button";
 import { AVAILABLE_LOCALES } from "@/lib/constants/locales";
 import { EXTERNAL_ROUTES, PUBLIC_ROUTES } from "@/lib/navigation/routes";
+import {
+  localizedEquivalentPath,
+  localizedLocaleFromPath,
+} from "@/lib/navigation/localized-routes";
 import { cn } from "@/lib/utils/tailwind";
 import { BrandLogo } from "./brand-logo";
 import { HeaderNav } from "./header-nav";
@@ -26,8 +31,11 @@ export function Header({
   position = "sticky",
   onLocaleChange,
 }: HeaderProps): React.ReactNode {
+  const pathname = usePathname();
+  const router = useRouter();
   const { locale: currentLocale, messages, setLocale } = useI18n();
-  const activeLocale = locale ?? currentLocale;
+  const routeLocale = localizedLocaleFromPath(pathname);
+  const activeLocale = locale ?? routeLocale ?? currentLocale;
   const availableLocales = locales?.length ? locales : AVAILABLE_LOCALES;
   const primaryNavItems = [
     { label: messages.header.nav.discover, href: PUBLIC_ROUTES.home },
@@ -97,9 +105,13 @@ export function Header({
 
       if (locale === undefined) {
         setLocale(nextLocale);
+        const destination = localizedEquivalentPath(pathname, nextLocale);
+        if (destination) {
+          router.push(`${destination}${window.location.search}`);
+        }
       }
     },
-    [locale, onLocaleChange, setLocale],
+    [locale, onLocaleChange, pathname, router, setLocale],
   );
 
   return (

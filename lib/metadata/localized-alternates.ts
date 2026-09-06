@@ -3,6 +3,7 @@ import {
   LocaleCode,
 } from "@/lib/constants/locales";
 import { resolveCanonicalUrl } from "./site-metadata";
+import { localizedEntryPath } from "@/lib/navigation/localized-routes";
 
 const OPEN_GRAPH_LOCALES: Record<LocaleCode, string> = {
   [LocaleCode.English]: "en_US",
@@ -31,5 +32,19 @@ export function localizedOpenGraphLocales(locale: LocaleCode) {
     alternateLocales: AVAILABLE_LOCALES
       .filter(({ code }) => code !== locale)
       .map(({ code }) => OPEN_GRAPH_LOCALES[code]),
+  };
+}
+
+export function localizedPublicAlternates(
+  locale: LocaleCode,
+  path: "/" | "/opportunities",
+) {
+  const languages = Object.fromEntries(AVAILABLE_LOCALES.map(({ code }) => [
+    code,
+    resolveCanonicalUrl(localizedEntryPath(path, code)),
+  ]));
+  return {
+    canonical: languages[locale],
+    languages: { ...languages, "x-default": languages.en },
   };
 }

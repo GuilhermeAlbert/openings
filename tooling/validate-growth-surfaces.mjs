@@ -173,6 +173,18 @@ assert.match(localeSyncSource, /setStoredLocale/u);
 assert.doesNotMatch(localeSyncSource, /redirect|geolocation/iu);
 assert.match(shortcutsSource, /\/discover\//u);
 
+const [localizedRoutesSource, headerSource] = await Promise.all([
+  readFile("lib/navigation/localized-routes.ts", "utf8"),
+  readFile("components/header/index.tsx", "utf8"),
+]);
+assert.match(localizedRoutesSource, /LOCALIZED_ENTRY_LOCALES/u);
+assert.match(localizedRoutesSource, /LocaleCode\.English/u);
+assert.match(localizedRoutesSource, /localizedEquivalentPath/u);
+assert.match(localizedRoutesSource, /\/discover\//u);
+assert.match(alternatesSource, /localizedPublicAlternates/u);
+assert.match(headerSource, /localizedEquivalentPath/u);
+assert.match(headerSource, /router\.push/u);
+
 const similarSource = await readFile("lib/opportunities/similar.ts", "utf8");
 const similar = await import(dataModule(similarSource));
 const currentJob = {
