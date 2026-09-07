@@ -40,7 +40,8 @@ try {
   assert.equal(await readFile(join(target, "community", "index.html"), "utf8"), "community-index");
   assert.equal(await readFile(join(target, "jobs", "index.html"), "utf8"), "job-shell");
   const worker = await readFile(join(target, "_worker.js"), "utf8");
-  assert.match(worker, /publishing-platform-staging\.business-850\.workers\.dev/u);
+  assert.match(worker, /publishing-platform-production\.business-850\.workers\.dev/u);
+  assert.doesNotMatch(worker, /publishing-platform-staging/u);
   assert.match(worker, /\/web\/openings/u);
   assert.match(worker, /env\.ASSETS\.fetch/u);
   assert.match(worker, /response\.ok/u);

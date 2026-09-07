@@ -72,7 +72,7 @@ export async function prepareCloudflarePagesExport({
 }
 
 export function pagesWorkerSource() {
-  return `const PLATFORM_ORIGIN = "https://publishing-platform-staging.business-850.workers.dev";
+  return `const PLATFORM_ORIGIN = "https://publishing-platform-production.business-850.workers.dev";
 const ENTITY_ROUTE = /^\\/(?:jobs\\/[^/]+|(?:authors|users)\\/[^/]+|(?:communities|community)\\/[^/]+\\/[^/]+)\\/?$/u;
 
 export default {
@@ -104,7 +104,7 @@ async function collectFiles(directory) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const result = await prepareCloudflarePagesExport({
     source: "out",
-    target: ".cloudflare/pages-preview",
+    target: ".cloudflare/pages-production",
   });
   console.log(
     `Prepared Cloudflare Pages shell: ${String(result.fileCount)} files, ${String(result.totalBytes)} bytes.`,
