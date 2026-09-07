@@ -40,6 +40,45 @@ async function assertRouteSpecificSocialImage() {
 async function main() {
   const html = await readFile(path.join(OUTPUT_DIRECTORY, "index.html"), "utf8");
 
+  assert.match(
+    html,
+    /<title>openings\.dev — Find tech jobs shared by GitHub communities<\/title>/u,
+  );
+  assert.match(html, /<script type="application\/ld\+json">[^<]*"@type":"WebSite"/u);
+  assert.match(html, /<script type="application\/ld\+json">[^<]*"@type":"Organization"/u);
+
+  const [designHtml, compareHtml, localizedHtml, sitemapXml] = await Promise.all([
+    readFile(path.join(OUTPUT_DIRECTORY, "design", "index.html"), "utf8"),
+    readFile(path.join(OUTPUT_DIRECTORY, "compare", "index.html"), "utf8"),
+    readFile(path.join(OUTPUT_DIRECTORY, "en", "discover", "remote", "index.html"), "utf8"),
+    readFile(path.join(OUTPUT_DIRECTORY, "sitemap.xml"), "utf8"),
+  ]);
+  for (const utilityHtml of [designHtml, compareHtml]) {
+    assert.match(utilityHtml, /<meta name="robots" content="noindex, follow"\/>/u);
+  }
+  assert.match(localizedHtml, /<meta property="og:locale" content="en_US"\/>/u);
+  assert.match(localizedHtml, /<meta property="og:locale:alternate" content="pt_BR"\/>/u);
+  assert.match(sitemapXml, /hreflang="x-default"/u);
+  assert.match(sitemapXml, /hreflang="pt"/u);
+
+  const [portugueseHome, portugueseSearch, portugueseBackend] = await Promise.all([
+    readFile(path.join(OUTPUT_DIRECTORY, "pt", "index.html"), "utf8"),
+    readFile(path.join(OUTPUT_DIRECTORY, "pt", "opportunities", "index.html"), "utf8"),
+    readFile(path.join(OUTPUT_DIRECTORY, "pt", "discover", "backend", "index.html"), "utf8"),
+  ]);
+  assert.match(portugueseHome, /^<!DOCTYPE html><html lang="pt"/u);
+  assert.match(portugueseHome, /<link rel="canonical" href="https:\/\/openings\.dev\/pt\/"\/>/u);
+  assert.match(portugueseHome, /hrefLang="en" href="https:\/\/openings\.dev\/"/u);
+  assert.match(portugueseHome, /hrefLang="x-default" href="https:\/\/openings\.dev\/"/u);
+  assert.match(portugueseHome, /Encontre as vagas de tecnologia que as comunidades já estão publicando\./u);
+  assert.match(portugueseSearch, /^<!DOCTYPE html><html lang="pt"/u);
+  assert.match(portugueseSearch, /Vagas de tecnologia publicadas em comunidades públicas no GitHub\./u);
+  assert.match(portugueseBackend, /^<!DOCTYPE html><html lang="pt"/u);
+  assert.match(portugueseBackend, /Vagas para desenvolvedores backend/u);
+  for (const slug of ["backend", "frontend", "mobile", "full-stack"]) {
+    assert.match(sitemapXml, new RegExp(`/pt/discover/${slug}`, "u"));
+  }
+
   assert.match(html, /<link rel="icon" href="\/brand-mark-light\.svg"/u);
   assert.match(html, /<link rel="icon" href="\/brand-mark-dark\.svg"/u);
   assert.match(html, /<link rel="apple-touch-icon" href="\/apple-touch-icon\.png"/u);

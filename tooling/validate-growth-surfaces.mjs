@@ -24,6 +24,30 @@ assert.doesNotMatch(sitemapSource, /listStaticOpportunityRouteIds/u);
 assert.doesNotMatch(sitemapSource, /[?&]repository=/u);
 assert.doesNotMatch(sitemapSource, /LEGACY_ROUTES/u);
 
+const [htaccessSource, designPageSource, comparePageSource] = await Promise.all([
+  readFile("public/.htaccess", "utf8"),
+  readFile("app/design/page.tsx", "utf8"),
+  readFile("app/compare/page.tsx", "utf8"),
+]);
+assert.match(htaccessSource, /RewriteCond %\{HTTP_HOST\} \^www\\\.openings\\\.dev\$ \[NC\]/u);
+assert.match(htaccessSource, /RewriteRule \^ https:\/\/openings\.dev%\{REQUEST_URI\} \[R=301,L,NE\]/u);
+for (const source of [designPageSource, comparePageSource]) {
+  assert.match(source, /robots:\s*\{\s*index:\s*false,\s*follow:\s*true\s*\}/u);
+}
+
+const [homePageSource, siteIdentitySource] = await Promise.all([
+  readFile("app/page.tsx", "utf8"),
+  readFile("lib/metadata/site-identity.ts", "utf8"),
+]);
+assert.match(homePageSource, /title:\s*"openings\.dev — Find tech jobs/u);
+assert.match(homePageSource, /application\/ld\+json/u);
+assert.match(homePageSource, /serializeSiteIdentityJsonLd/u);
+assert.match(siteIdentitySource, /"@type":\s*"WebSite"/u);
+assert.match(siteIdentitySource, /"@type":\s*"Organization"/u);
+assert.match(siteIdentitySource, /sameAs/u);
+assert.match(siteIdentitySource, /EXTERNAL_ROUTES\.githubRepository/u);
+assert.match(siteIdentitySource, /replace\(\/<\/gu, "\\\\u003c"\)/u);
+
 const jobPostingSource = await readFile("lib/metadata/job-posting.ts", "utf8");
 const jobPosting = await import(dataModule(jobPostingSource));
 const eligibleJob = {
@@ -114,7 +138,7 @@ assert.match(layoutSource, /"application\/atom\+xml"/u);
 
 const curatedSource = await readFile("lib/discovery/curated-pages.ts", "utf8");
 const curated = await import(dataModule(curatedSource));
-assert.equal(curated.CURATED_DISCOVERY_PRESETS.length, 6);
+assert.equal(curated.CURATED_DISCOVERY_PRESETS.length, 10);
 for (const preset of curated.CURATED_DISCOVERY_PRESETS) {
   assert.equal(Object.keys(preset.copy).sort().join(","), "de,en,es,fr,it,pt");
   for (const content of Object.values(preset.copy)) {
@@ -124,22 +148,94 @@ for (const preset of curated.CURATED_DISCOVERY_PRESETS) {
   }
   assert.equal(preset.feedSlug, preset.slug);
 }
+for (const [slug, area] of [
+  ["backend", "backend"],
+  ["frontend", "frontend"],
+  ["mobile", "mobile"],
+  ["full-stack", "fullstack"],
+]) {
+  const preset = curated.CURATED_DISCOVERY_PRESETS.find((entry) => entry.slug === slug);
+  assert.equal(preset?.query.areas, area);
+}
 const [alternatesSource, curatedPageSource, localeSyncSource, shortcutsSource] = await Promise.all([
   readFile("lib/metadata/localized-alternates.ts", "utf8"),
   readFile("app/[locale]/discover/[slug]/page.tsx", "utf8"),
-  readFile("app/[locale]/discover/[slug]/_components/locale-route-sync.tsx", "utf8"),
+  readFile("app/_components/locale-route-sync/index.tsx", "utf8"),
   readFile("app/opportunities/_components/opportunities-screen/opportunities-quick-filters/discovery-shortcuts/index.tsx", "utf8"),
 ]);
 assert.match(alternatesSource, /"x-default"/u);
 assert.match(alternatesSource, /AVAILABLE_LOCALES/u);
+for (const openGraphLocale of ["en_US", "pt_BR", "es_ES", "it_IT", "fr_FR", "de_DE"]) {
+  assert.match(alternatesSource, new RegExp(`\\b${openGraphLocale}\\b`, "u"));
+}
+assert.match(alternatesSource, /localizedOpenGraphLocales/u);
 assert.match(curatedPageSource, /generateStaticParams/u);
 assert.match(curatedPageSource, /listStaticOpportunities/u);
 assert.match(curatedPageSource, /slice\(0, 20\)/u);
 assert.match(curatedPageSource, /localizedAlternates/u);
+assert.match(curatedPageSource, /localizedOpenGraphLocales/u);
+assert.match(curatedPageSource, /localizedEntryPath\("\/opportunities", page\.locale\)/u);
+assert.match(curatedPageSource, /alternateLocale/u);
 assert.match(curatedPageSource, /application\/atom\+xml/u);
+assert.match(sitemapSource, /alternates:\s*\{\s*languages/u);
+assert.match(sitemapSource, /localizedAlternates/u);
+assert.match(sitemapSource, /LOCALIZED_ENTRY_LOCALES/u);
+assert.match(sitemapSource, /localizedPublicAlternates/u);
+const [defaultHomeSource, defaultOpportunitiesSource] = await Promise.all([
+  readFile("app/page.tsx", "utf8"),
+  readFile("app/opportunities/page.tsx", "utf8"),
+]);
+for (const source of [defaultHomeSource, defaultOpportunitiesSource]) {
+  assert.match(source, /localizedPublicAlternates/u);
+  assert.match(source, /LocaleCode\.English/u);
+}
 assert.match(localeSyncSource, /setStoredLocale/u);
 assert.doesNotMatch(localeSyncSource, /redirect|geolocation/iu);
 assert.match(shortcutsSource, /\/discover\//u);
+
+const [localizedRoutesSource, headerSource] = await Promise.all([
+  readFile("lib/navigation/localized-routes.ts", "utf8"),
+  readFile("components/header/index.tsx", "utf8"),
+]);
+assert.match(localizedRoutesSource, /LOCALIZED_ENTRY_LOCALES/u);
+assert.match(localizedRoutesSource, /LocaleCode\.English/u);
+assert.match(localizedRoutesSource, /localizedEquivalentPath/u);
+assert.match(localizedRoutesSource, /\/discover\//u);
+assert.match(alternatesSource, /localizedPublicAlternates/u);
+assert.match(headerSource, /localizedEquivalentPath/u);
+assert.match(headerSource, /localizedEntryPath\("\/", activeLocale\)/u);
+assert.match(headerSource, /router\.push/u);
+const deferredHomeSource = await readFile(
+  "app/_components/deferred-home-opportunities/index.tsx",
+  "utf8",
+);
+assert.match(deferredHomeSource, /localizedEntryPath\("\/opportunities", locale\)/u);
+const footerSource = await readFile("components/footer/index.tsx", "utf8");
+assert.match(footerSource, /localizedEntryPath\("\/", locale\)/u);
+
+const [providerSource, localizedHomeSource, localizedOpportunitiesSource] = await Promise.all([
+  readFile("components/providers/i18n-provider/index.tsx", "utf8"),
+  readFile("app/[locale]/page.tsx", "utf8"),
+  readFile("app/[locale]/opportunities/page.tsx", "utf8"),
+]);
+assert.match(providerSource, /initialLocale/u);
+for (const source of [localizedHomeSource, localizedOpportunitiesSource]) {
+  assert.match(source, /LOCALIZED_ENTRY_LOCALES/u);
+  assert.match(source, /dynamicParams\s*=\s*false/u);
+  assert.match(source, /localizedPublicAlternates/u);
+  assert.match(source, /localizedOpenGraphLocales/u);
+  assert.match(source, /<I18nProvider initialLocale=\{page\.locale\}>/u);
+  assert.match(source, /<LocaleRouteSync locale=\{page\.locale\}/u);
+}
+
+const [packageSource, exportLocaleSource] = await Promise.all([
+  readFile("package.json", "utf8"),
+  readFile("tooling/localize-exported-html.mjs", "utf8"),
+]);
+assert.match(packageSource, /next build && node tooling\/localize-exported-html\.mjs/u);
+assert.match(exportLocaleSource, /AVAILABLE_EXPORTED_LOCALES/u);
+assert.match(exportLocaleSource, /<html lang=/u);
+assert.match(exportLocaleSource, /readdir/u);
 
 const similarSource = await readFile("lib/opportunities/similar.ts", "utf8");
 const similar = await import(dataModule(similarSource));

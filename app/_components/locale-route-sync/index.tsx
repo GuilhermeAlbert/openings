@@ -5,7 +5,7 @@ import { LOCALE_CHANGE_EVENT } from "@/components/providers/i18n-provider/consta
 import { setStoredLocale } from "@/components/providers/i18n-provider/helpers";
 import { isLocaleCode } from "@/lib/constants/locales";
 
-export function LocaleRouteSync({ locale }: { locale: string }) {
+export function LocaleRouteSync({ locale }: { locale: string }): React.ReactNode {
   useEffect(() => {
     if (!isLocaleCode(locale)) return;
     setStoredLocale(locale);

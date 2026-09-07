@@ -16,11 +16,26 @@ import {
 } from "./helpers";
 import type { I18nContextValue } from "./types";
 
-export function I18nProvider({ children }: React.PropsWithChildren): React.ReactNode {
+interface I18nProviderProps extends React.PropsWithChildren {
+  initialLocale?: LocaleCode;
+}
+
+export function I18nProvider({
+  children,
+  initialLocale,
+}: I18nProviderProps): React.ReactNode {
+  const getLocaleSnapshot = React.useCallback(
+    () => initialLocale ?? getStoredLocale(),
+    [initialLocale],
+  );
+  const getServerLocaleSnapshot = React.useCallback(
+    () => initialLocale ?? DEFAULT_LOCALE,
+    [initialLocale],
+  );
   const locale = React.useSyncExternalStore(
     subscribeLocaleStore,
-    getStoredLocale,
-    () => DEFAULT_LOCALE,
+    getLocaleSnapshot,
+    getServerLocaleSnapshot,
   );
 
   const setLocale = React.useCallback((nextLocale: LocaleCode) => {

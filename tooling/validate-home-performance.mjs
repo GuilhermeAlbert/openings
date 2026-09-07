@@ -85,7 +85,7 @@ assert.match(
 );
 assert.match(
   deferredSource,
-  /href="\/opportunities"/u,
+  /href=\{localizedEntryPath\("\/opportunities", locale\)\}/u,
   "The no-JavaScript fallback must link to the dedicated discovery route",
 );
 assert.match(

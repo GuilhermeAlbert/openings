@@ -8,6 +8,7 @@ import { LinkedinIcon } from "@/components/icons/linkedin";
 import { MastodonIcon } from "@/components/icons/mastodon";
 import { ThreadsIcon } from "@/components/icons/threads";
 import { EXTERNAL_ROUTES, PUBLIC_ROUTES } from "@/lib/navigation/routes";
+import { localizedEntryPath } from "@/lib/navigation/localized-routes";
 import { cn } from "@/lib/utils/tailwind";
 import { FooterBottom } from "./footer-bottom";
 import { FooterBrand } from "./footer-brand";
@@ -31,7 +32,7 @@ export function Footer({
   linkGroups,
   socialLinks,
 }: FooterProps): React.ReactNode {
-  const { messages } = useI18n();
+  const { locale, messages } = useI18n();
   const footerMessages = messages.footer;
   const year = new Date().getFullYear().toString();
 
@@ -152,6 +153,9 @@ export function Footer({
   const resolvedLinkGroups = linkGroups?.length
     ? linkGroups
     : defaultLinkGroups;
+  const resolvedBrandHref = brandHref === "/"
+    ? localizedEntryPath("/", locale)
+    : brandHref;
   const resolvedSocialLinks = socialLinks?.length
     ? socialLinks
     : defaultSocialLinks;
@@ -182,7 +186,7 @@ export function Footer({
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-8">
           <FooterBrand
             className="lg:col-span-5"
-            href={brandHref}
+            href={resolvedBrandHref}
             brandName={brandName}
             brandTagline={resolvedBrandTagline}
             description={resolvedDescription}

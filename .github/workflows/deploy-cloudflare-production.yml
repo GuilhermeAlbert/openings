@@ -13,7 +13,7 @@ concurrency:
 jobs:
   deploy:
     name: Validate, build, and deploy production
-    if: github.ref == 'refs/heads/cloudflare-production'
+    if: github.ref == 'refs/heads/main'
     environment: production
     runs-on: ubuntu-latest
     timeout-minutes: 30

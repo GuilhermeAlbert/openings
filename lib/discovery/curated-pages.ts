@@ -5,6 +5,10 @@ export const CURATED_DISCOVERY_SLUGS = [
   "remote",
   "internships",
   "react",
+  "backend",
+  "frontend",
+  "mobile",
+  "full-stack",
   "data-ai",
   "devops",
   "salary",
@@ -62,6 +66,50 @@ export const CURATED_DISCOVERY_PRESETS: CuratedDiscoveryPreset[] = [
     },
   },
   {
+    slug: "backend", feedSlug: "backend", query: { areas: "backend" },
+    copy: {
+      en: { title: "Backend developer jobs", description: "Current backend engineering roles shared by public GitHub communities.", explanation: "This page uses structured backend role evidence. Review the original listing for responsibilities, requirements, and application details.", cta: "Explore all backend jobs", empty: "No backend jobs are available in the current snapshot." },
+      pt: { title: "Vagas para desenvolvedores backend", description: "Vagas atuais de engenharia backend publicadas em comunidades públicas no GitHub.", explanation: "A seleção usa evidências estruturadas da área backend. Confira responsabilidades, requisitos e candidatura no anúncio original.", cta: "Explorar todas as vagas backend", empty: "Não há vagas backend no snapshot atual." },
+      es: { title: "Vacantes para desarrolladores backend", description: "Puestos actuales de ingeniería backend publicados en comunidades públicas de GitHub.", explanation: "La selección usa evidencia estructurada del área backend. Consulta responsabilidades, requisitos y candidatura en el anuncio original.", cta: "Explorar todas las vacantes backend", empty: "No hay vacantes backend en la instantánea actual." },
+      it: { title: "Offerte per sviluppatori backend", description: "Posizioni attuali di ingegneria backend condivise da comunità GitHub pubbliche.", explanation: "La selezione usa dati strutturati relativi all’area backend. Consulta responsabilità, requisiti e candidatura nell’annuncio originale.", cta: "Esplora tutte le offerte backend", empty: "Nessuna offerta backend nell’istantanea attuale." },
+      fr: { title: "Offres d’emploi développeur backend", description: "Postes actuels en ingénierie backend publiés par des communautés GitHub publiques.", explanation: "La sélection repose sur des données structurées liées au backend. Consultez l’annonce d’origine pour les missions, prérequis et modalités de candidature.", cta: "Explorer toutes les offres backend", empty: "Aucune offre backend dans l’instantané actuel." },
+      de: { title: "Backend-Entwicklerstellen", description: "Aktuelle Backend-Rollen aus öffentlichen GitHub-Communities.", explanation: "Die Auswahl basiert auf strukturierten Angaben zum Backend-Bereich. Aufgaben, Anforderungen und Bewerbung stehen in der Originalausschreibung.", cta: "Alle Backend-Stellen ansehen", empty: "Im aktuellen Datenstand gibt es keine Backend-Stellen." },
+    },
+  },
+  {
+    slug: "frontend", feedSlug: "frontend", query: { areas: "frontend" },
+    copy: {
+      en: { title: "Frontend developer jobs", description: "Current frontend engineering roles shared by public GitHub communities.", explanation: "The structured frontend area brings together interface-focused roles without relying on broad keyword matching. Verify each role at its original source.", cta: "Explore all frontend jobs", empty: "No frontend jobs are available in the current snapshot." },
+      pt: { title: "Vagas para desenvolvedores frontend", description: "Vagas atuais de engenharia frontend publicadas em comunidades públicas no GitHub.", explanation: "A área estruturada de frontend reúne funções voltadas a interfaces sem depender de uma busca ampla por palavras. Confirme cada vaga na fonte original.", cta: "Explorar todas as vagas frontend", empty: "Não há vagas frontend no snapshot atual." },
+      es: { title: "Vacantes para desarrolladores frontend", description: "Puestos actuales de ingeniería frontend publicados en comunidades públicas de GitHub.", explanation: "El área estructurada de frontend reúne puestos centrados en interfaces sin depender de coincidencias amplias de texto. Confirma cada vacante en su fuente original.", cta: "Explorar todas las vacantes frontend", empty: "No hay vacantes frontend en la instantánea actual." },
+      it: { title: "Offerte per sviluppatori frontend", description: "Posizioni attuali di ingegneria frontend condivise da comunità GitHub pubbliche.", explanation: "L’area strutturata frontend riunisce ruoli dedicati alle interfacce senza affidarsi a ricerche testuali generiche. Verifica ogni posizione alla fonte.", cta: "Esplora tutte le offerte frontend", empty: "Nessuna offerta frontend nell’istantanea attuale." },
+      fr: { title: "Offres d’emploi développeur frontend", description: "Postes actuels en ingénierie frontend publiés par des communautés GitHub publiques.", explanation: "Le domaine frontend structuré rassemble les postes centrés sur les interfaces sans correspondance textuelle trop large. Vérifiez chaque poste à sa source.", cta: "Explorer toutes les offres frontend", empty: "Aucune offre frontend dans l’instantané actuel." },
+      de: { title: "Frontend-Entwicklerstellen", description: "Aktuelle Frontend-Rollen aus öffentlichen GitHub-Communities.", explanation: "Der strukturierte Frontend-Bereich bündelt oberflächennahe Rollen ohne breite Stichwortsuche. Prüfe jede Stelle in der Originalquelle.", cta: "Alle Frontend-Stellen ansehen", empty: "Im aktuellen Datenstand gibt es keine Frontend-Stellen." },
+    },
+  },
+  {
+    slug: "mobile", feedSlug: "mobile", query: { areas: "mobile" },
+    copy: {
+      en: { title: "Mobile developer jobs", description: "Current mobile engineering roles shared by public GitHub communities.", explanation: "This curated area covers structured mobile role evidence across native and cross-platform work. Check the source for the required platform and stack.", cta: "Explore all mobile jobs", empty: "No mobile jobs are available in the current snapshot." },
+      pt: { title: "Vagas para desenvolvedores mobile", description: "Vagas atuais de desenvolvimento mobile publicadas em comunidades públicas no GitHub.", explanation: "A área reúne evidências estruturadas de funções mobile nativas e multiplataforma. Confira na fonte a plataforma e a stack exigidas.", cta: "Explorar todas as vagas mobile", empty: "Não há vagas mobile no snapshot atual." },
+      es: { title: "Vacantes para desarrolladores móviles", description: "Puestos actuales de desarrollo móvil publicados en comunidades públicas de GitHub.", explanation: "El área reúne evidencia estructurada de puestos móviles nativos y multiplataforma. Consulta en la fuente la plataforma y las tecnologías requeridas.", cta: "Explorar todas las vacantes móviles", empty: "No hay vacantes móviles en la instantánea actual." },
+      it: { title: "Offerte per sviluppatori mobile", description: "Posizioni attuali nello sviluppo mobile condivise da comunità GitHub pubbliche.", explanation: "L’area riunisce dati strutturati su ruoli mobile nativi e multipiattaforma. Controlla alla fonte piattaforma e tecnologie richieste.", cta: "Esplora tutte le offerte mobile", empty: "Nessuna offerta mobile nell’istantanea attuale." },
+      fr: { title: "Offres d’emploi développeur mobile", description: "Postes actuels en développement mobile publiés par des communautés GitHub publiques.", explanation: "Ce domaine rassemble des données structurées sur les rôles mobiles natifs et multiplateformes. Consultez la source pour connaître la plateforme et les technologies requises.", cta: "Explorer toutes les offres mobile", empty: "Aucune offre mobile dans l’instantané actuel." },
+      de: { title: "Stellen für Mobile-Entwicklung", description: "Aktuelle Mobile-Rollen aus öffentlichen GitHub-Communities.", explanation: "Der Bereich bündelt strukturierte Angaben zu nativer und plattformübergreifender Mobile-Entwicklung. Plattform und benötigte Technologien stehen in der Quelle.", cta: "Alle Mobile-Stellen ansehen", empty: "Im aktuellen Datenstand gibt es keine Mobile-Stellen." },
+    },
+  },
+  {
+    slug: "full-stack", feedSlug: "full-stack", query: { areas: "fullstack" },
+    copy: {
+      en: { title: "Full-stack developer jobs", description: "Current full-stack engineering roles shared by public GitHub communities.", explanation: "This page uses structured full-stack role evidence rather than assuming that every mixed technology listing is full-stack. Verify the scope at the original source.", cta: "Explore all full-stack jobs", empty: "No full-stack jobs are available in the current snapshot." },
+      pt: { title: "Vagas para desenvolvedores full-stack", description: "Vagas atuais de engenharia full-stack publicadas em comunidades públicas no GitHub.", explanation: "A página usa evidências estruturadas da função full-stack, sem presumir que toda vaga com tecnologias variadas seja full-stack. Confirme o escopo na fonte original.", cta: "Explorar todas as vagas full-stack", empty: "Não há vagas full-stack no snapshot atual." },
+      es: { title: "Vacantes para desarrolladores full-stack", description: "Puestos actuales de ingeniería full-stack publicados en comunidades públicas de GitHub.", explanation: "La página usa evidencia estructurada del puesto full-stack, sin asumir que toda vacante con tecnologías variadas lo sea. Confirma el alcance en la fuente original.", cta: "Explorar todas las vacantes full-stack", empty: "No hay vacantes full-stack en la instantánea actual." },
+      it: { title: "Offerte per sviluppatori full-stack", description: "Posizioni attuali di ingegneria full-stack condivise da comunità GitHub pubbliche.", explanation: "La pagina usa dati strutturati sul ruolo full-stack senza presumere che ogni annuncio con tecnologie diverse lo sia. Verifica l’ambito alla fonte originale.", cta: "Esplora tutte le offerte full-stack", empty: "Nessuna offerta full-stack nell’istantanea attuale." },
+      fr: { title: "Offres d’emploi développeur full-stack", description: "Postes actuels en ingénierie full-stack publiés par des communautés GitHub publiques.", explanation: "La page repose sur des données structurées du rôle full-stack sans considérer toute annonce multitechnologie comme telle. Vérifiez le périmètre dans la source d’origine.", cta: "Explorer toutes les offres full-stack", empty: "Aucune offre full-stack dans l’instantané actuel." },
+      de: { title: "Full-Stack-Entwicklerstellen", description: "Aktuelle Full-Stack-Rollen aus öffentlichen GitHub-Communities.", explanation: "Die Seite nutzt strukturierte Angaben zur Full-Stack-Rolle und stuft nicht jede Anzeige mit mehreren Technologien automatisch so ein. Prüfe den Umfang in der Originalquelle.", cta: "Alle Full-Stack-Stellen ansehen", empty: "Im aktuellen Datenstand gibt es keine Full-Stack-Stellen." },
+    },
+  },
+  {
     slug: "data-ai", feedSlug: "data-ai", query: { areas: "data-ai" },
     copy: {
       en: { title: "Data and AI jobs", description: "Recent data, machine learning, and AI roles from public communities.", explanation: "The curated area groups structured role evidence while preserving the original listing as authority.", cta: "Explore all Data and AI jobs", empty: "No Data and AI jobs are available in the current snapshot." },
@@ -106,6 +154,10 @@ export function matchesCuratedPreset(
       item.taxonomy?.employmentTypes.includes("internship"));
   }
   if (slug === "react") return item.taxonomy?.technologies.includes("react") ?? false;
+  if (slug === "backend") return item.taxonomy?.areas.includes("backend") ?? false;
+  if (slug === "frontend") return item.taxonomy?.areas.includes("frontend") ?? false;
+  if (slug === "mobile") return item.taxonomy?.areas.includes("mobile") ?? false;
+  if (slug === "full-stack") return item.taxonomy?.areas.includes("fullstack") ?? false;
   if (slug === "data-ai") return item.taxonomy?.areas.includes("data-ai") ?? false;
   if (slug === "devops") return item.taxonomy?.areas.includes("devops-sre") ?? false;
   return Boolean(item.salary);

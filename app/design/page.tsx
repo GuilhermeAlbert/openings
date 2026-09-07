@@ -3,12 +3,15 @@ import { DesignSystemShowcase } from "@/app/design-system/_components/design-sys
 import { PUBLIC_ROUTES } from "@/lib/navigation/routes";
 import { createPageMetadata } from "@/lib/metadata/site-metadata";
 
-export const metadata: Metadata = createPageMetadata({
-  title: "Design system",
-  description:
-    "Review the brand foundations, shared components, content standards, UI states, and responsive rules used by openings.dev.",
-  path: PUBLIC_ROUTES.design,
-});
+export const metadata: Metadata = {
+  ...createPageMetadata({
+    title: "Design system",
+    description:
+      "Review the brand foundations, shared components, content standards, UI states, and responsive rules used by openings.dev.",
+    path: PUBLIC_ROUTES.design,
+  }),
+  robots: { index: false, follow: true },
+};
 
 export default function DesignPage(): React.ReactNode {
   return <DesignSystemShowcase />;
