@@ -15,7 +15,7 @@ export async function fetchJson(
   url: string,
   options: FetchJsonOptions = {},
 ): Promise<unknown> {
-  const response = await fetch(url, {
+  const response = await fetchWithTransportRetry(url, {
     cache: options.cache,
     headers: { Accept: "application/json" },
     signal: options.signal,
@@ -38,3 +38,4 @@ export async function fetchJson(
     throw new Error(`Public data response was not valid JSON at ${url}`);
   }
 }
+import { fetchWithTransportRetry } from "./fetch-with-transport-retry.mjs";
