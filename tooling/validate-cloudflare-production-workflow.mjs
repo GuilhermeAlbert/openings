@@ -12,6 +12,7 @@ assert.doesNotMatch(workflow, /^\s{2}push:/mu);
 assert.match(workflow, /permissions:\s*\n\s{2}contents: read/u);
 assert.match(workflow, /group: cloudflare-production-\$\{\{ github\.ref \}\}/u);
 assert.match(workflow, /cancel-in-progress: false/u);
+assert.match(workflow, /if: github\.ref == 'refs\/heads\/main'/u);
 assert.match(workflow, /^\s{4}environment: production$/mu);
 assert.match(workflow, /timeout-minutes: 30/u);
 assert.match(
