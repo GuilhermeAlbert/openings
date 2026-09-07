@@ -35,11 +35,17 @@ export async function prepareCloudflarePagesExport({
     },
   });
 
-  for (const route of ["authors", "users", "communities", "community"]) {
+  for (const [route, depth] of [
+    ["jobs", 1],
+    ["authors", 1],
+    ["users", 1],
+    ["communities", 2],
+    ["community", 2],
+  ]) {
     const aliasDirectory = resolve(targetRoot, "route-indexes", route);
     await mkdir(aliasDirectory, { recursive: true });
     await copyFile(
-      resolve(sourceRoot, route, "index.html"),
+      await firstEntityIndex(resolve(sourceRoot, route), depth),
       resolve(aliasDirectory, "index.html"),
     );
   }
@@ -99,6 +105,15 @@ async function collectFiles(directory) {
     return entry.isDirectory() ? collectFiles(path) : [path];
   }));
   return nested.flat();
+}
+
+async function firstEntityIndex(directory, depth) {
+  if (depth === 0) return resolve(directory, "index.html");
+  const entries = (await readdir(directory, { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory())
+    .sort((left, right) => left.name.localeCompare(right.name));
+  if (entries.length === 0) throw new Error(`No representative entity shell in ${directory}`);
+  return firstEntityIndex(resolve(directory, entries[0].name), depth - 1);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
