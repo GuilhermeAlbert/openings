@@ -24,9 +24,9 @@ Use Next.js image and font facilities where they preserve static export. Keep ex
 
 ## Cloudflare shell builds
 
-The Cloudflare preview serves job, author, and community entity routes through
+Cloudflare production serves job, author, and community entity routes through
 the publishing platform with a static client shell as its availability
-fallback. `npm run build:cloudflare-preview` therefore sets
+fallback. `npm run build:cloudflare-production` therefore sets
 `OPENINGS_CLOUDFLARE_SHELL_ONLY=1` and generates one representative parameter
 per dynamic entity template. Next.js static export requires at least one
 parameter for these routes; do not change this mode to an empty list.
