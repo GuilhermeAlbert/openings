@@ -30,7 +30,7 @@ const commands = [
   "npm run test",
   "npm run lint",
   "npm run build:cloudflare-production",
-  "npx --yes wrangler@4.86.0 pages deploy .cloudflare/pages-production --project-name=openings-dev-web --branch=production",
+  "npx --yes wrangler@4.86.0 pages deploy .cloudflare/pages-production --project-name=openings-dev-web --branch=main",
 ];
 commands.reduce((previousIndex, command) => {
   const index = workflow.indexOf(command);
