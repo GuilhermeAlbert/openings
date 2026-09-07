@@ -7,6 +7,7 @@ import {
   communityRouteSegmentsFromRepository,
   repositoryFromCommunitySegments,
 } from "@/lib/opportunities/routing";
+import { selectStaticEntityParams } from "@/lib/runtime/cloudflare-build";
 
 interface LegacyCommunityPageProps {
   params: Promise<{ owner: string; name: string }>;
@@ -23,7 +24,7 @@ export async function generateStaticParams() {
     if (segments) params.push({ owner: segments.owner, name: segments.name });
   }
 
-  return params;
+  return selectStaticEntityParams(params);
 }
 
 async function resolveDestination(params: LegacyCommunityPageProps["params"]) {

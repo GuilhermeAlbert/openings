@@ -11,6 +11,7 @@ import {
 import { listAuthorSocialCardParams } from "@/lib/metadata/social-card-static-params";
 import { authorHandleFromRoute } from "@/lib/opportunities/routing";
 import { getSnapshotUserByHandle } from "@/lib/opportunities/users";
+import { selectStaticEntityParams } from "@/lib/runtime/cloudflare-build";
 
 interface AuthorSocialImageProps {
   params: Promise<{ handle: string }>;
@@ -24,7 +25,7 @@ export const contentType = SOCIAL_CARD_CONTENT_TYPE;
 const getAuthor = cache(getSnapshotUserByHandle);
 
 export async function generateStaticParams(): Promise<Array<{ handle: string }>> {
-  return listAuthorSocialCardParams();
+  return selectStaticEntityParams(await listAuthorSocialCardParams());
 }
 
 async function resolveAuthor(params: AuthorSocialImageProps["params"]) {

@@ -22,6 +22,19 @@ Derive inexpensive values during render. Use `useMemo`, `useCallback`, and `Reac
 
 Use Next.js image and font facilities where they preserve static export. Keep explicit image dimensions. Remove a dependency only after searches and a successful production build prove it unused.
 
+## Cloudflare shell builds
+
+Cloudflare production serves job, author, and community entity routes through
+the publishing platform with a static client shell as its availability
+fallback. `npm run build:cloudflare-production` therefore sets
+`OPENINGS_CLOUDFLARE_SHELL_ONLY=1` and generates one representative parameter
+per dynamic entity template. Next.js static export requires at least one
+parameter for these routes; do not change this mode to an empty list.
+
+The normal `npm run build` must remain unaffected and generate every static
+entity and social image used by the current Hostinger deployment. Always verify
+both commands when changing the build-target selector.
+
 ## Verification
 
 Run `npm run build` after changes to routing, data loading, rendering boundaries, fonts, images, or dependency configuration. A cleaner code shape is not itself evidence of a performance improvement.

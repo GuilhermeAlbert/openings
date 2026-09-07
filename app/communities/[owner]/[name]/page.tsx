@@ -15,6 +15,7 @@ import {
 import { loadSafely } from "@/lib/utils/load-safely";
 import { getCommunityStatus } from "@/lib/opportunities/status";
 import { CommunityTelemetry } from "./_components/community-telemetry";
+import { selectStaticEntityParams } from "@/lib/runtime/cloudflare-build";
 
 interface CommunityRepositoryPageProps {
   params: Promise<{
@@ -37,7 +38,7 @@ export async function generateStaticParams() {
     }
   }
 
-  return params;
+  return selectStaticEntityParams(params);
 }
 
 async function resolveCommunityProfile(

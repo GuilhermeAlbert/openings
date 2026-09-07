@@ -12,6 +12,7 @@ import {
   listSnapshotUsers,
 } from "@/lib/opportunities/users";
 import { loadSafely } from "@/lib/utils/load-safely";
+import { selectStaticEntityParams } from "@/lib/runtime/cloudflare-build";
 
 interface AuthorProfilePageProps {
   params: Promise<{ handle: string }>;
@@ -21,7 +22,7 @@ export const dynamicParams = false;
 
 export async function generateStaticParams(): Promise<Array<{ handle: string }>> {
   const authors = await listSnapshotUsers();
-  return authors.map(({ handle }) => ({ handle }));
+  return selectStaticEntityParams(authors.map(({ handle }) => ({ handle })));
 }
 
 async function resolveAuthorProfile(params: AuthorProfilePageProps["params"]) {

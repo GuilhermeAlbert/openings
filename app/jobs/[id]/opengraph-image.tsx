@@ -7,6 +7,7 @@ import {
 import { createOpportunitySocialCard } from "@/lib/metadata/social-card-presentations";
 import { listJobSocialCardParams } from "@/lib/metadata/social-card-static-params";
 import { fetchOpportunityById } from "@/lib/opportunities/api";
+import { selectStaticEntityParams } from "@/lib/runtime/cloudflare-build";
 
 interface JobSocialImageProps {
   params: Promise<{ id: string }>;
@@ -20,7 +21,7 @@ export const contentType = SOCIAL_CARD_CONTENT_TYPE;
 const getOpportunity = cache(fetchOpportunityById);
 
 export async function generateStaticParams(): Promise<Array<{ id: string }>> {
-  return listJobSocialCardParams();
+  return selectStaticEntityParams(await listJobSocialCardParams());
 }
 
 async function resolveOpportunity(params: JobSocialImageProps["params"]) {

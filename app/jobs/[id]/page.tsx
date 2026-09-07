@@ -14,6 +14,7 @@ import {
 import { listStaticOpportunityRouteIds } from "@/lib/opportunities/static-api";
 import { getCommunityStatus } from "@/lib/opportunities/status";
 import { buildOpportunityTrustSummary } from "@/lib/opportunities/trust";
+import { selectStaticEntityParams } from "@/lib/runtime/cloudflare-build";
 import {
   buildJobPostingJsonLd,
   serializeJobPostingJsonLd,
@@ -27,7 +28,7 @@ export const dynamicParams = false;
 
 export async function generateStaticParams(): Promise<Array<{ id: string }>> {
   const ids = await listStaticOpportunityRouteIds();
-  return ids.map((id) => ({ id }));
+  return selectStaticEntityParams(ids.map((id) => ({ id })));
 }
 
 const resolveOpportunity = cache(async (params: JobPageProps["params"]) => {

@@ -6,6 +6,7 @@ import {
   buildUserPath,
 } from "@/lib/opportunities/routing";
 import { listSnapshotUsers } from "@/lib/opportunities/users";
+import { selectStaticEntityParams } from "@/lib/runtime/cloudflare-build";
 
 interface LegacyAuthorPageProps {
   params: Promise<{ handle: string }>;
@@ -15,7 +16,7 @@ export const dynamicParams = false;
 
 export async function generateStaticParams(): Promise<Array<{ handle: string }>> {
   const authors = await listSnapshotUsers();
-  return authors.map(({ handle }) => ({ handle }));
+  return selectStaticEntityParams(authors.map(({ handle }) => ({ handle })));
 }
 
 async function resolveDestination(params: LegacyAuthorPageProps["params"]) {

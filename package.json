@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && node tooling/localize-exported-html.mjs && node tooling/validate-home-performance.mjs --exported && node tooling/publish-social-images.mjs",
+    "build:cloudflare-production": "OPENINGS_CLOUDFLARE_SHELL_ONLY=1 npm run build && node tooling/cloudflare-pages-export.mjs",
     "start": "next start",
     "lint": "eslint",
     "test": "node tooling/run-validations.mjs",

@@ -1,0 +1,9 @@
+/jobs/* /jobs/ 200
+/authors/ /route-indexes/authors/ 200
+/users/ /route-indexes/users/ 200
+/communities/ /route-indexes/communities/ 200
+/community/ /route-indexes/community/ 200
+/authors/* /entity/author/ 200
+/users/* /entity/author/ 200
+/communities/* /entity/community/ 200
+/community/* /entity/community/ 200
