@@ -42,7 +42,8 @@ jobs:
         run: npm run build:cloudflare-production
 
       - name: Deploy Cloudflare production
-        run: npx --yes wrangler@4.86.0 pages deploy .cloudflare/pages-production --project-name=openings-dev-web --branch=main
+        # Git source is main; the existing Pages project's production branch is production.
+        run: npx --yes wrangler@4.86.0 pages deploy .cloudflare/pages-production --project-name=openings-dev-web --branch=production
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
