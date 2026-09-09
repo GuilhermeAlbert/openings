@@ -50,6 +50,17 @@ export async function prepareCloudflarePagesExport({
     );
   }
 
+  // Listing rewrites must retain their own index, not the representative
+  // entity HTML used by the publishing Worker for individual profiles.
+  for (const route of ["authors", "users", "communities", "community"]) {
+    const listingDirectory = resolve(targetRoot, "listing-indexes", route);
+    await mkdir(listingDirectory, { recursive: true });
+    await copyFile(
+      resolve(sourceRoot, route, "index.html"),
+      resolve(listingDirectory, "index.html"),
+    );
+  }
+
   await writeFile(resolve(targetRoot, "_worker.js"), `${pagesWorkerSource()}\n`, "utf8");
 
   const files = await collectFiles(targetRoot);

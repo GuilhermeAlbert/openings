@@ -31,7 +31,23 @@ try {
 
   const result = await prepareCloudflarePagesExport({ source, target, maximumFiles: 20_000 });
 
-  assert.equal(result.fileCount, 13);
+  for (const [route, expected] of [
+    ["authors", "authors"],
+    ["users", "users"],
+    ["communities", "communities"],
+    ["community", "community-index"],
+  ]) {
+    assert.equal(
+      await readFile(join(target, "listing-indexes", route, "index.html"), "utf8"),
+      expected,
+      `${route} listing must not serve a representative entity profile`,
+    );
+  }
+  const redirects = await readFile(new URL("../public/_redirects", import.meta.url), "utf8");
+  for (const route of ["authors", "users", "communities", "community"]) {
+    assert.ok(redirects.includes(`/${route}/ /listing-indexes/${route}/ 200`));
+  }
+  assert.equal(result.fileCount, 17);
   assert.equal(await readFile(join(target, "index.html"), "utf8"), "home");
   assert.equal(await readFile(join(target, "_next", "static", "app.js"), "utf8"), "asset");
   assert.equal(await readFile(join(target, "authors", "index.html"), "utf8"), "authors");
