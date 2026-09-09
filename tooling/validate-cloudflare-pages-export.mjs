@@ -16,6 +16,10 @@ try {
   await mkdir(join(source, "users", "alice"), { recursive: true });
   await mkdir(join(source, "communities", "acme", "jobs"), { recursive: true });
   await mkdir(join(source, "community", "acme", "jobs"), { recursive: true });
+  await mkdir(join(source, "entity", "author"), { recursive: true });
+  await mkdir(join(source, "entity", "community"), { recursive: true });
+  await writeFile(join(source, "entity", "author", "index.html"), "runtime-author-shell");
+  await writeFile(join(source, "entity", "community", "index.html"), "runtime-community-shell");
   await writeFile(join(source, "index.html"), "home");
   await writeFile(join(source, "_next", "static", "app.js"), "asset");
   await writeFile(join(source, "jobs", "index.html"), "job-shell");
@@ -47,7 +51,7 @@ try {
   for (const route of ["authors", "users", "communities", "community"]) {
     assert.ok(redirects.includes(`/${route}/ /listing-indexes/${route}/ 200`));
   }
-  assert.equal(result.fileCount, 17);
+  assert.equal(result.fileCount, 19);
   assert.equal(await readFile(join(target, "index.html"), "utf8"), "home");
   assert.equal(await readFile(join(target, "_next", "static", "app.js"), "utf8"), "asset");
   assert.equal(await readFile(join(target, "authors", "index.html"), "utf8"), "authors");
@@ -62,11 +66,16 @@ try {
   assert.match(worker, /env\.ASSETS\.fetch/u);
   assert.match(worker, /response\.ok/u);
   assert.match(worker, /catch/u);
-  assert.equal(await readFile(join(target, "route-indexes", "jobs", "index.html"), "utf8"), "job");
-  assert.equal(await readFile(join(target, "route-indexes", "authors", "index.html"), "utf8"), "author");
-  assert.equal(await readFile(join(target, "route-indexes", "users", "index.html"), "utf8"), "user");
-  assert.equal(await readFile(join(target, "route-indexes", "communities", "index.html"), "utf8"), "community");
-  assert.equal(await readFile(join(target, "route-indexes", "community", "index.html"), "utf8"), "legacy-community");
+  for (const [route, expected] of [
+    ["jobs", "job-shell"],
+    ["authors", "runtime-author-shell"],
+    ["users", "runtime-author-shell"],
+    ["communities", "runtime-community-shell"],
+    ["community", "runtime-community-shell"],
+  ]) {
+    assert.equal(await readFile(join(target, "route-indexes", route, "index.html"), "utf8"), expected,
+      `${route} must resolve the requested URL at runtime, never hydrate a representative entity`);
+  }
   await assert.rejects(access(join(target, "jobs", "job-123", "index.html")));
   await assert.rejects(access(join(target, "authors", "alice", "index.html")));
   await assert.rejects(access(join(target, "users", "alice", "index.html")));

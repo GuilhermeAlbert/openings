@@ -35,23 +35,24 @@ export async function prepareCloudflarePagesExport({
     },
   });
 
-  for (const [route, depth] of [
-    ["jobs", 1],
-    ["authors", 1],
-    ["users", 1],
-    ["communities", 2],
-    ["community", 2],
+  // Metadata is personalized by the publishing Worker, but the body must
+  // resolve the requested URL instead of hydrating an unrelated entity.
+  for (const [route, shell] of [
+    ["jobs", "jobs"],
+    ["authors", "entity/author"],
+    ["users", "entity/author"],
+    ["communities", "entity/community"],
+    ["community", "entity/community"],
   ]) {
     const aliasDirectory = resolve(targetRoot, "route-indexes", route);
     await mkdir(aliasDirectory, { recursive: true });
     await copyFile(
-      await firstEntityIndex(resolve(sourceRoot, route), depth),
+      resolve(sourceRoot, shell, "index.html"),
       resolve(aliasDirectory, "index.html"),
     );
   }
 
-  // Listing rewrites must retain their own index, not the representative
-  // entity HTML used by the publishing Worker for individual profiles.
+  // Listing rewrites retain their own index, separate from entity shells.
   for (const route of ["authors", "users", "communities", "community"]) {
     const listingDirectory = resolve(targetRoot, "listing-indexes", route);
     await mkdir(listingDirectory, { recursive: true });
@@ -116,15 +117,6 @@ async function collectFiles(directory) {
     return entry.isDirectory() ? collectFiles(path) : [path];
   }));
   return nested.flat();
-}
-
-async function firstEntityIndex(directory, depth) {
-  if (depth === 0) return resolve(directory, "index.html");
-  const entries = (await readdir(directory, { withFileTypes: true }))
-    .filter((entry) => entry.isDirectory())
-    .sort((left, right) => left.name.localeCompare(right.name));
-  if (entries.length === 0) throw new Error(`No representative entity shell in ${directory}`);
-  return firstEntityIndex(resolve(directory, entries[0].name), depth - 1);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
