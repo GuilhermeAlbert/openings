@@ -7,8 +7,16 @@ const [workflow, packageSource] = await Promise.all([
 ]);
 
 assert.match(workflow, /^name: Validate$/mu);
-assert.match(workflow, /^\s{2}pull_request:$/mu);
-assert.match(workflow, /^\s{2}push:\s*\n\s{4}branches:\s*\[main\]$/mu);
+assert.match(
+  workflow,
+  /^\s{2}pull_request:$/mu,
+  "Pull requests must retain contracts, lint, production build, and export validation",
+);
+assert.doesNotMatch(
+  workflow,
+  /^\s{2}push:/mu,
+  "Pushes must leave the production build to native Pages without duplicate Actions validation",
+);
 assert.match(workflow, /permissions:\s*\n\s{2}contents: read/u);
 assert.match(workflow, /cancel-in-progress: true/u);
 assert.match(workflow, /actions\/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1/u);
