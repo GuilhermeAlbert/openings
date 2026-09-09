@@ -26,6 +26,7 @@ assert.match(
 assert.match(workflow, /node-version: ["']20["']/u);
 
 const commands = [
+  "node tooling/preflight-cloudflare-pages.mjs",
   "npm ci",
   "npm run test",
   "npm run lint",
