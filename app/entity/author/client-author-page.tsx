@@ -19,6 +19,7 @@ function authorFromLocation(): string | null {
 
 export function ClientAuthorPage(): React.ReactNode {
   const { messages } = useI18n();
+  const [loadError, setLoadError] = React.useState(false);
   const [profile, setProfile] = React.useState<UserSummary | null | undefined>(undefined);
 
   React.useEffect(() => {
@@ -30,7 +31,7 @@ export function ClientAuthorPage(): React.ReactNode {
     let active = true;
     fetchAuthorArtifact(handle)
       .then((value) => { if (active) setProfile(value); })
-      .catch(() => { if (active) setProfile(null); });
+      .catch(() => { if (active) setLoadError(true); });
     return () => { active = false; };
   }, []);
 
@@ -38,10 +39,12 @@ export function ClientAuthorPage(): React.ReactNode {
     return <OpportunitiesPage profile={{ kind: ShareableProfileKind.Publisher, profile }} />;
   }
   return (
-    <p className="mx-auto flex min-h-[60vh] max-w-xl items-center justify-center px-4 text-center text-sm text-muted-foreground" role="status">
-      {profile === undefined
-        ? messages.opportunities.feedback.selectedLoading
-        : messages.opportunities.feedback.selectedNotFound}
+    <p className="mx-auto flex min-h-[60vh] max-w-xl items-center justify-center px-4 text-center text-sm text-muted-foreground" role={loadError ? "alert" : "status"}>
+      {loadError
+        ? messages.opportunities.feedback.selectedLoadError
+        : profile === undefined
+          ? messages.opportunities.feedback.selectedLoading
+          : messages.opportunities.feedback.selectedNotFound}
     </p>
   );
 }
