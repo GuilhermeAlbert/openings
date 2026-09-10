@@ -13,14 +13,19 @@ const [routes, footer, promotion, types, ...locales] = await Promise.all([
   ...localeFiles.map((file) => readFile(file, "utf8")),
 ]);
 
-assert.match(routes, /iosApp:\s*"https:\/\/apps\.apple\.com\//u);
-assert.match(routes, /androidApp:\s*"https:\/\/play\.google\.com\//u);
+assert.doesNotMatch(routes, /iosApp:/u);
+assert.match(
+  routes,
+  /androidApp:\s*"https:\/\/play\.google\.com\/store\/apps\/details\?id=dev\.openings\.mobile"/u,
+);
 assert.match(footer, /<FooterPromotion/u);
 assert.match(footer, /EXTERNAL_ROUTES\.githubRepository/u);
-assert.match(footer, /EXTERNAL_ROUTES\.iosApp/u);
+assert.doesNotMatch(footer, /iosHref=/u);
 assert.match(footer, /EXTERNAL_ROUTES\.androidApp/u);
 assert.match(promotion, /aria-labelledby/u);
 assert.match(promotion, /target="_blank"/u);
+assert.match(promotion, /<Button\s+disabled/u);
+assert.doesNotMatch(promotion, /label:\s*androidAction,[^}]*disabled:\s*true/u);
 assert.match(types, /promotion:\s*\{/u);
 assert.match(types, /githubAction: string/u);
 assert.match(types, /iosAction: string/u);

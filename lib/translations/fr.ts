@@ -503,7 +503,7 @@ export const frTranslations: TranslationMessages = {
       description:
         "Ajoutez une étoile à Openings sur GitHub, suivez le travail public ou emportez la recherche sur mobile.",
       githubAction: "Ajouter une étoile sur GitHub",
-      iosAction: "Télécharger pour iOS",
+      iosAction: "iOS — Bientôt disponible",
       androidAction: "Télécharger pour Android",
     },
     groups: {

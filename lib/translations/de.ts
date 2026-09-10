@@ -502,7 +502,7 @@ export const deTranslations: TranslationMessages = {
       description:
         "Gib Openings einen Stern auf GitHub, verfolge die öffentliche Arbeit oder nutze die Suche mobil.",
       githubAction: "Stern auf GitHub geben",
-      iosAction: "Für iOS laden",
+      iosAction: "iOS — Demnächst verfügbar",
       androidAction: "Für Android laden",
     },
     groups: {

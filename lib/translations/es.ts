@@ -506,7 +506,7 @@ export const esTranslations: TranslationMessages = {
       description:
         "Destaca Openings en GitHub, sigue el trabajo público o lleva la búsqueda contigo en el móvil.",
       githubAction: "Dar una estrella en GitHub",
-      iosAction: "Descargar para iOS",
+      iosAction: "iOS — Próximamente",
       androidAction: "Descargar para Android",
     },
     groups: {

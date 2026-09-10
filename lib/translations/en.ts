@@ -539,7 +539,7 @@ export const enTranslations: TranslationMessages = {
       description:
         "Star Openings on GitHub, follow the public work, or take the search experience with you on mobile.",
       githubAction: "Star on GitHub",
-      iosAction: "Download for iOS",
+      iosAction: "iOS — Coming soon",
       androidAction: "Get it for Android",
     },
     groups: {
