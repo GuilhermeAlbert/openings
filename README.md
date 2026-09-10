@@ -127,6 +127,12 @@ Architecture, public data files, local development, integration details, and con
 
 **[Read the Openings project overview →](https://openings.dev/docs/overview)**
 
+### Website builds
+
+Cloudflare Pages builds production from `main` using `npm run pages:build` on Node.js 24.14.1. The command installs locked dependencies, runs the validation suite and lint, then creates the existing Cloudflare production export. A failed stage stops publication and leaves the last successful deployment serving visitors.
+
+Automatic branch previews are disabled. The website build is separate from the data pipeline and social-publisher workflows; it does not publish social posts.
+
 ## License
 
 Openings is available under the [MIT License](./LICENSE).
