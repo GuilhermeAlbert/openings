@@ -540,7 +540,7 @@ export const ptTranslations: TranslationMessages = {
       description:
         "Favorite o Openings no GitHub, acompanhe o trabalho público ou leve a busca com você no celular.",
       githubAction: "Dar estrela no GitHub",
-      iosAction: "Baixar para iOS",
+      iosAction: "iOS — Em breve",
       androidAction: "Baixar para Android",
     },
     groups: {

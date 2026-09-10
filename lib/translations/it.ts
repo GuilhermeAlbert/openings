@@ -501,7 +501,7 @@ export const itTranslations: TranslationMessages = {
       description:
         "Metti una stella a Openings su GitHub, segui il lavoro pubblico o porta la ricerca con te sul telefono.",
       githubAction: "Metti una stella su GitHub",
-      iosAction: "Scarica per iOS",
+      iosAction: "iOS — Prossimamente",
       androidAction: "Scarica per Android",
     },
     groups: {

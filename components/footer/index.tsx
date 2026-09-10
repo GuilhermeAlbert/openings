@@ -199,7 +199,6 @@ export function Footer({
         <FooterPromotion
           {...footerMessages.promotion}
           githubHref={EXTERNAL_ROUTES.githubRepository}
-          iosHref={EXTERNAL_ROUTES.iosApp}
           androidHref={EXTERNAL_ROUTES.androidApp}
         />
 

@@ -10,7 +10,6 @@ interface FooterPromotionProps {
   iosAction: string;
   androidAction: string;
   githubHref: string;
-  iosHref: string;
   androidHref: string;
 }
 
@@ -21,7 +20,6 @@ export function FooterPromotion({
   iosAction,
   androidAction,
   githubHref,
-  iosHref,
   androidHref,
 }: FooterPromotionProps): React.ReactNode {
   const links = [
@@ -32,18 +30,10 @@ export function FooterPromotion({
       primary: true,
     },
     {
-      href: iosHref,
-      label: iosAction,
-      icon: Download,
-      primary: false,
-      disabled: true,
-    },
-    {
       href: androidHref,
       label: androidAction,
       icon: Smartphone,
       primary: false,
-      disabled: true,
     },
   ];
 
@@ -65,26 +55,32 @@ export function FooterPromotion({
       </div>
 
       <div className="grid gap-2 sm:grid-cols-3 lg:flex lg:flex-wrap lg:justify-end">
-        {links.map(
-          ({ href, label, icon: Icon, primary, disabled }) =>
-            !disabled && (
-              <Button
-                key={href}
-                asChild
-                variant={primary ? "default" : "outline"}
-                className={
-                  primary
-                    ? "border-primary bg-primary text-primary-foreground hover:border-primary-hover hover:bg-primary-hover"
-                    : "border-night-foreground/25 text-night-foreground hover:border-night-foreground/40 hover:bg-night-foreground/10"
-                }
-              >
-                <Link href={href} target="_blank" rel="noreferrer">
-                  <Icon aria-hidden="true" />
-                  <span>{label}</span>
-                </Link>
-              </Button>
-            ),
-        )}
+        {links.map(({ href, label, icon: Icon, primary }) => (
+          <Button
+            key={href}
+            asChild
+            variant={primary ? "default" : "outline"}
+            className={
+              primary
+                ? "border-primary bg-primary text-primary-foreground hover:border-primary-hover hover:bg-primary-hover"
+                : "border-night-foreground/25 text-night-foreground hover:border-night-foreground/40 hover:bg-night-foreground/10"
+            }
+          >
+            <Link href={href} target="_blank" rel="noreferrer">
+              <Icon aria-hidden="true" />
+              <span>{label}</span>
+            </Link>
+          </Button>
+        ))}
+
+        <Button
+          disabled
+          variant="outline"
+          className="border-night-foreground/25 text-night-foreground"
+        >
+          <Download aria-hidden="true" />
+          <span>{iosAction}</span>
+        </Button>
       </div>
     </section>
   );
