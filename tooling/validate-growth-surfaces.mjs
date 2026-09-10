@@ -24,13 +24,10 @@ assert.doesNotMatch(sitemapSource, /listStaticOpportunityRouteIds/u);
 assert.doesNotMatch(sitemapSource, /[?&]repository=/u);
 assert.doesNotMatch(sitemapSource, /LEGACY_ROUTES/u);
 
-const [htaccessSource, designPageSource, comparePageSource] = await Promise.all([
-  readFile("public/.htaccess", "utf8"),
+const [designPageSource, comparePageSource] = await Promise.all([
   readFile("app/design/page.tsx", "utf8"),
   readFile("app/compare/page.tsx", "utf8"),
 ]);
-assert.match(htaccessSource, /RewriteCond %\{HTTP_HOST\} \^www\\\.openings\\\.dev\$ \[NC\]/u);
-assert.match(htaccessSource, /RewriteRule \^ https:\/\/openings\.dev%\{REQUEST_URI\} \[R=301,L,NE\]/u);
 for (const source of [designPageSource, comparePageSource]) {
   assert.match(source, /robots:\s*\{\s*index:\s*false,\s*follow:\s*true\s*\}/u);
 }

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { access, readFile, readdir } from "node:fs/promises";
 
 const packageJson = JSON.parse(await readFile("package.json", "utf8"));
 
@@ -18,5 +18,27 @@ assert.equal(
   "OPENINGS_CLOUDFLARE_SHELL_ONLY=1 npm run build && node tooling/cloudflare-pages-export.mjs",
   "Native Pages builds must preserve the existing production export command",
 );
+
+const workflowDirectory = ".github/workflows";
+const workflowSources = await Promise.all(
+  (await readdir(workflowDirectory))
+    .filter((name) => /\.ya?ml$/u.test(name))
+    .map((name) => readFile(`${workflowDirectory}/${name}`, "utf8")),
+);
+assert.doesNotMatch(
+  workflowSources.join("\n"),
+  /wrangler(?:@[^\s]+)?\s+pages\s+deploy|preflight-cloudflare-pages/iu,
+  "Native Pages must be the only Cloudflare Pages deployment owner",
+);
+for (const retiredPath of [
+  ".github/workflows/deploy-cloudflare-production.yml",
+  "tooling/preflight-cloudflare-pages.mjs",
+]) {
+  await assert.rejects(
+    access(retiredPath),
+    (error) => error?.code === "ENOENT",
+    `${retiredPath} must stay retired`,
+  );
+}
 
 console.log("Native Pages build contract is valid.");

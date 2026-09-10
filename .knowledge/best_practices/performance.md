@@ -31,9 +31,10 @@ fallback. `npm run build:cloudflare-production` therefore sets
 per dynamic entity template. Next.js static export requires at least one
 parameter for these routes; do not change this mode to an empty list.
 
-The normal `npm run build` must remain unaffected and generate every static
-entity and social image used by the current Hostinger deployment. Always verify
-both commands when changing the build-target selector.
+The normal `npm run build` must remain unaffected as the complete-export
+validation path and generate every static entity and social image. This command
+does not imply ownership by a current deployment provider. Always verify both
+commands when changing the build-target selector.
 
 ## Verification
 

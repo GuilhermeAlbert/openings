@@ -1,5 +1,0 @@
-RewriteEngine On
-RewriteCond %{HTTP_HOST} ^www\.openings\.dev$ [NC]
-RewriteRule ^ https://openings.dev%{REQUEST_URI} [R=301,L,NE]
-
-ErrorDocument 404 /404.html
